@@ -36,6 +36,8 @@ const STATUS_ICONS = {
 };
 
 import { useData } from '@/contexts/DataContext';
+import { exportLibraryDataToCSV } from '@/lib/export-utils';
+import { Download } from 'lucide-react';
 
 export default function Library() {
     const { library: entries, setLibrary: setEntries } = useData();
@@ -90,6 +92,15 @@ export default function Library() {
                 description="Your personal second brain for books, courses, and digital assets."
             >
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportLibraryDataToCSV(entries)}
+                        className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+                    >
+                        <Download className="h-4 w-4" />
+                        Export Library
+                    </Button>
                     <div className="relative group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
                         <input

@@ -201,3 +201,90 @@ export const exportFinanceDataToCSV = (transactions: Transaction[], investments:
     alert('Failed to export finance data. Please check console for details.');
   }
 };
+export const exportGoalsDataToCSV = (goals: Goal[]) => {
+  try {
+    const rows: string[][] = [['Title', 'Category', 'Timeframe', 'Status', 'Progress (%)', 'Description']];
+    goals.forEach(g => {
+      rows.push([g.title, g.category, g.timeframe, g.status, g.progress.toString(), g.description || '']);
+    });
+    downloadCSV(rows, 'goals_export');
+  } catch (error) {
+    console.error('Failed to export goals data:', error);
+  }
+};
+
+export const exportExecutionDataToCSV = (tasks: any[]) => {
+  try {
+    const rows: string[][] = [['Task', 'Priority', 'Status', 'Due Date']];
+    tasks.forEach(t => {
+      rows.push([t.content, t.priority, t.status, t.dueDate || '']);
+    });
+    downloadCSV(rows, 'execution_export');
+  } catch (error) {
+    console.error('Failed to export execution data:', error);
+  }
+};
+
+export const exportHabitsDataToCSV = (habits: Habit[], health: HealthEntry[]) => {
+  try {
+    const rows: string[][] = [['Type', 'Name/Date', 'Status/Value', 'Details']];
+    habits.forEach(h => {
+      rows.push(['Habit', h.name, `Streak: ${h.streak}`, `Completions: ${h.completedDates.length}`]);
+    });
+    health.forEach(entry => {
+      rows.push(['Health', entry.date, `Mood: ${entry.mood}, Sleep: ${entry.sleep}h, Water: ${entry.water}L`, entry.workout || '']);
+    });
+    downloadCSV(rows, 'habits_health_export');
+  } catch (error) {
+    console.error('Failed to export habits data:', error);
+  }
+};
+
+export const exportContentDataToCSV = (items: any[]) => {
+  try {
+    const rows: string[][] = [['Title', 'Channel', 'Status', 'Priority', 'Due Date']];
+    items.forEach(item => {
+      rows.push([item.title, item.channel, item.status, item.priority, item.dueDate || '']);
+    });
+    downloadCSV(rows, 'content_pipeline_export');
+  } catch (error) {
+    console.error('Failed to export content data:', error);
+  }
+};
+
+export const exportLibraryDataToCSV = (items: any[]) => {
+  try {
+    const rows: string[][] = [['Name', 'Category', 'Status', 'Progress (%)', 'Format']];
+    items.forEach(item => {
+      rows.push([item.name, item.category, item.status, item.progress?.toString() || '0', item.format || '']);
+    });
+    downloadCSV(rows, 'library_export');
+  } catch (error) {
+    console.error('Failed to export library data:', error);
+  }
+};
+
+export const exportReflectionsDataToCSV = (items: any[]) => {
+  try {
+    const rows: string[][] = [['Date', 'Reflection Snippet']];
+    items.forEach(item => {
+      rows.push([item.date, item.text]);
+    });
+    downloadCSV(rows, 'reflections_export');
+  } catch (error) {
+    console.error('Failed to export reflections data:', error);
+  }
+};
+
+const downloadCSV = (rows: string[][], filename: string) => {
+  const csvContent = rows.map(e => e.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${filename}_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};

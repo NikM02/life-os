@@ -11,6 +11,8 @@ import {
 import { format, addDays, subDays, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
+import { exportReflectionsDataToCSV } from '@/lib/export-utils';
+import { Download } from 'lucide-react';
 
 export default function DailyReflectionsPage() {
     const { reflections, setReflections } = useData();
@@ -50,20 +52,31 @@ export default function DailyReflectionsPage() {
                 title="Neural Journals"
                 description="Synthesize your consciousness. Capture high-fidelity insights and evolve the protocol."
             >
-                <div className="flex items-center gap-4 bg-secondary/30 p-1.5 rounded-2xl border border-white/5 backdrop-blur-xl">
-                    <Button variant="ghost" size="icon" onClick={() => setCurrentDate(prev => subDays(prev, 1))} className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all">
-                        <ChevronLeft className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportReflectionsDataToCSV(reflections)}
+                        className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+                    >
+                        <Download className="h-4 w-4" />
+                        Export Data
                     </Button>
-                    <div className="flex flex-col items-center min-w-[140px]">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{isToday ? 'Live Sync' : 'Archive Data'}</span>
-                            {activeReflection && <CheckCircle2 className="h-3 w-3 text-primary" />}
+                    <div className="flex items-center gap-4 bg-secondary/30 p-1.5 rounded-2xl border border-white/5 backdrop-blur-xl">
+                        <Button variant="ghost" size="icon" onClick={() => setCurrentDate(prev => subDays(prev, 1))} className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all">
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex flex-col items-center min-w-[140px]">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{isToday ? 'Live Sync' : 'Archive Data'}</span>
+                                {activeReflection && <CheckCircle2 className="h-3 w-3 text-primary" />}
+                            </div>
+                            <span className="text-sm font-black tracking-tighter">{format(currentDate, 'MMMM d, yyyy')}</span>
                         </div>
-                        <span className="text-sm font-black tracking-tighter">{format(currentDate, 'MMMM d, yyyy')}</span>
+                        <Button variant="ghost" size="icon" onClick={() => setCurrentDate(prev => addDays(prev, 1))} className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all" disabled={isToday}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setCurrentDate(prev => addDays(prev, 1))} className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all" disabled={isToday}>
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
                 </div>
             </PageHeader>
 

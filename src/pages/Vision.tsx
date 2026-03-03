@@ -95,7 +95,9 @@ export default function Vision() {
   const vision = {
     ...defaultVision,
     ...storedVision,
-    principles: Array.isArray(storedVision?.principles) ? storedVision.principles : defaultVision.principles,
+    principles: Array.isArray(storedVision?.principles) && storedVision.principles.length >= 3
+      ? storedVision.principles
+      : defaultVision.principles,
     quarterlyGoals: { ...defaultVision.quarterlyGoals, ...storedVision?.quarterlyGoals },
     coreSections: { ...defaultVision.coreSections, ...storedVision?.coreSections },
   };
@@ -129,18 +131,20 @@ export default function Vision() {
   return (
     <div className="max-w-6xl mx-auto space-y-16 pb-32 px-4 animate-fade-in">
       <PageHeader
-        title="Life Vision"
-        description="Define your path and guiding principles."
+        title="N-OS Vision"
+        description="Life intelligence and guiding principles."
       >
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => exportVisionDataToCSV(vision)}
-          className="gap-2 border-white/10 bg-white/5 hover:bg-white/10 rounded-xl px-4 h-9 transition-all text-[9px] font-bold uppercase tracking-wider"
-        >
-          <Download className="h-3 w-3" />
-          Export Vision
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportVisionDataToCSV(vision)}
+            className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export Vision
+          </Button>
+        </div>
       </PageHeader>
 
       <section className="space-y-6">

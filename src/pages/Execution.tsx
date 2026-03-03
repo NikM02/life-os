@@ -8,6 +8,8 @@ import { useData } from '@/contexts/DataContext';
 import { KanbanTask, KanbanColumn, ExecutionData } from '@/types/lifeos';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { exportExecutionDataToCSV } from '@/lib/export-utils';
+import { Download } from 'lucide-react';
 
 const INITIAL_COLUMNS: KanbanColumn[] = [
     { id: 'todo', title: 'To Do' },
@@ -54,6 +56,15 @@ export default function Execution() {
                 description="Ship your dreams. Turn goals into reality through consistent action."
             >
                 <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportExecutionDataToCSV(data.tasks)}
+                        className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+                    >
+                        <Download className="h-4 w-4" />
+                        Export Tasks
+                    </Button>
                     <Button
                         onClick={() => setEditingTask({
                             id: Math.random().toString(36).substr(2, 9),

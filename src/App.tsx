@@ -15,6 +15,7 @@ import Finance from "./pages/Finance";
 import Execution from "./pages/Execution";
 import ContentPipeline from "./pages/ContentPipeline";
 import DailyReflections from "./pages/DailyReflections";
+import Mission from "./pages/Mission";
 import NotFound from "./pages/NotFound";
 
 import { useState, useEffect } from "react";
@@ -72,6 +73,7 @@ const AppContent = () => {
           <Route path="/" element={<Affirmations />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vision" element={<Vision />} />
+          <Route path="/mission" element={<Mission />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/habits" element={<Habits />} />
           <Route path="/execution" element={<Execution />} />

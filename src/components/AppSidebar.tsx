@@ -19,6 +19,7 @@ const navItems = [
   { title: 'Affirmations', url: '/', icon: Sparkles },
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Vision', url: '/vision', icon: Eye },
+  { title: 'Mission', url: '/mission', icon: Target },
   { title: 'Goal Mastery', url: '/goals', icon: Target },
   { title: 'Daily Execution', url: '/execution', icon: Layers },
   { title: 'Neural Journals', url: '/neural-journals', icon: BrainCircuit },
@@ -34,9 +35,13 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-border bg-sidebar-background transition-all duration-300">
       <div className="p-6 pb-4">
-        <Link to="/dashboard" className="flex items-center gap-2 mb-2 group">
-          <h1 className="text-3xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity">
-            N <span className="text-muted-foreground/20 group-hover:text-primary transition-colors">OS</span>
+        <Link to="/dashboard" className="flex items-center gap-4 mb-2 group">
+          <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all overflow-hidden">
+            <img src="/logo.png" alt="N-OS Logo" className="h-8 w-8 object-contain" />
+          </div>
+          <h1 className="text-2xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col">
+            N-OS
+            <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40 leading-none">Intelligence.</span>
           </h1>
         </Link>
       </div>
@@ -70,7 +75,7 @@ export function AppSidebar() {
         {user && (
           <button
             onClick={() => supabase.auth.signOut()}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 hover:text-destructive hover:bg-destructive/5 transition-all group"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/5 border border-destructive/10 hover:border-destructive/20 transition-all group shadow-sm active:scale-95"
           >
             <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             <span>Terminate Session</span>

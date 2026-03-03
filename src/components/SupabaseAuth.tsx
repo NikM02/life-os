@@ -20,7 +20,19 @@ export default function SupabaseAuth() {
                 if (error) throw error;
                 alert('Check your email for the confirmation link!');
             } else {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                // Handle special admin login
+                let authEmail = email;
+                let authPassword = password;
+
+                if (email === 'admin' && password === 'admin123') {
+                    authEmail = 'admin@nos.life'; // Hardcoded internal mapping
+                    authPassword = 'admin123';
+                }
+
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: authEmail,
+                    password: authPassword
+                });
                 if (error) throw error;
             }
         } catch (error: any) {

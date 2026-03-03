@@ -7,13 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import {
   Plus, Flame, Check, Trash2, Droplets, Moon, Dumbbell,
-  Smile, ChevronLeft, ChevronRight, Activity, Zap, Shield, Sparkles, Heart, BrainCircuit
+  Smile, ChevronLeft, ChevronRight, Activity, Zap, Shield, Sparkles, Heart, BrainCircuit, Download
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader, EmptyState, Button, ProgressBar, CategoryBadge } from '@/components/shared';
 import { format, subDays, addDays, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useData } from '@/contexts/DataContext';
+import { exportAllDataToCSV, exportHabitsDataToCSV } from '@/lib/export-utils';
 
 const categories: GoalCategory[] = ['Wealth', 'Health', 'Skills', 'Relationships', 'Spiritual', 'Lifestyle', 'Books', 'Finance', 'Networking'];
 
@@ -67,17 +68,27 @@ export default function Habits() {
 
   return (
     <div className="max-w-6xl mx-auto pb-32 px-4 animate-fade-in">
-      <PageHeader title="Core Systems" description="Master your habits, monitor your biology. Optimize the human machine.">
-        <div className="flex items-center gap-4 bg-secondary/30 p-1.5 rounded-2xl border border-white/5 backdrop-blur-xl">
-          <Button variant="ghost" size="icon" onClick={() => navigateDate(-1)} className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex flex-col items-center min-w-[140px]">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{isToday ? 'Live Sync' : 'Archive Data'}</span>
-            <span className="text-sm font-black tracking-tighter">{format(currentDate, 'MMMM d, yyyy')}</span>
+      <PageHeader title="Habits & Health" description="Monitor your daily protocols and biometrics.">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex items-center gap-2 bg-secondary/20 p-1 rounded-xl border border-white/5 backdrop-blur-md">
+            <Button variant="ghost" size="icon" onClick={() => navigateDate(-1)} className="h-8 w-8 rounded-lg">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex flex-col items-center min-w-[100px]">
+              <span className="text-xs font-bold tracking-tight">{format(currentDate, 'MMM d, yyyy')}</span>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => navigateDate(1)} className="h-8 w-8 rounded-lg" disabled={isToday}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => navigateDate(1)} className="h-9 w-9 rounded-xl hover:bg-white/10 transition-all" disabled={isToday}>
-            <ChevronRight className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportHabitsDataToCSV(habits, health)}
+            className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export Data
           </Button>
         </div>
       </PageHeader>
@@ -220,128 +231,53 @@ export default function Habits() {
         </TabsContent>
 
         <TabsContent value="health" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="glass-card p-8 animate-slide-up rounded-[2.5rem] relative overflow-hidden group border-white/5 hover:border-indigo-500/30 transition-all duration-700 shadow-xl">
-              <div className="absolute -top-4 -right-4 p-10 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-125 transition-all duration-1000 rotate-12">
-                <Moon className="h-20 w-20 text-indigo-500" />
-              </div>
-              <div className="flex items-center gap-4 mb-8 relative z-10">
-                <div className="p-4 rounded-2xl bg-indigo-500/10 text-indigo-500 shadow-glow shadow-indigo-500/10 transition-transform group-hover:scale-110">
-                  <Moon className="h-6 w-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="glass-card p-6 rounded-2xl border-white/5 hover:border-indigo-500/20 transition-all">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-500">
+                  <Moon className="h-5 w-5" />
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 uppercase">Sleep Session</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Sleep</h3>
+                <span className="ml-auto text-2xl font-black text-indigo-500">{activeHealth.sleep}h</span>
               </div>
-              <div className="space-y-8 relative z-10">
-                <Slider value={[activeHealth.sleep]} onValueChange={([v]) => updateHealth('sleep', v)} max={12} step={0.5} className="cursor-pointer" />
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Recovery Hours</span>
-                  <span className="text-4xl font-black tracking-tighter text-indigo-500">{activeHealth.sleep}h</span>
-                </div>
-              </div>
+              <Slider value={[activeHealth.sleep]} onValueChange={([v]) => updateHealth('sleep', v)} max={12} step={0.5} />
             </div>
 
-            <div className="glass-card p-8 animate-slide-up rounded-[2.5rem] relative overflow-hidden group border-white/5 hover:border-primary/30 transition-all duration-700 shadow-xl">
-              <div className="absolute -top-4 -right-4 p-10 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-125 transition-all duration-1000 -rotate-12">
-                <Droplets className="h-20 w-20 text-primary" />
-              </div>
-              <div className="flex items-center gap-4 mb-8 relative z-10">
-                <div className="p-4 rounded-2xl bg-primary/10 text-primary shadow-glow shadow-primary/10 transition-transform group-hover:scale-110">
-                  <Droplets className="h-6 w-6" />
+            <div className="glass-card p-6 rounded-2xl border-white/5 hover:border-primary/20 transition-all">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                  <Droplets className="h-5 w-5" />
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 uppercase">Hydration</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Hydration</h3>
+                <span className="ml-auto text-2xl font-black text-primary">{activeHealth.water}L</span>
               </div>
-              <div className="space-y-8 relative z-10">
-                <Slider value={[activeHealth.water]} onValueChange={([v]) => updateHealth('water', v)} max={5} step={0.25} className="cursor-pointer" />
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Intake Volume</span>
-                  <span className="text-4xl font-black tracking-tighter text-primary">{activeHealth.water}L</span>
-                </div>
-              </div>
+              <Slider value={[activeHealth.water]} onValueChange={([v]) => updateHealth('water', v)} max={5} step={0.25} />
             </div>
 
-            <div className="glass-card p-8 animate-slide-up rounded-[2.5rem] relative overflow-hidden group border-white/5 hover:border-success/30 transition-all duration-700 shadow-xl">
-              <div className="absolute -top-4 -right-4 p-10 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-125 transition-all duration-1000 rotate-45">
-                <Dumbbell className="h-20 w-20 text-success" />
-              </div>
-              <div className="flex items-center gap-4 mb-8 relative z-10">
-                <div className="p-4 rounded-2xl bg-success/10 text-success shadow-glow shadow-success/10 transition-transform group-hover:scale-110">
-                  <Dumbbell className="h-6 w-6" />
+            <div className="glass-card p-6 rounded-2xl border-white/5 hover:border-success/20 transition-all">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 rounded-xl bg-success/10 text-success">
+                  <Dumbbell className="h-5 w-5" />
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 uppercase">Physical Output</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Workout</h3>
               </div>
-              <div className="space-y-4 relative z-10">
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30 ml-1">Training Protocol</label>
-                <Input
-                  placeholder="Session log..."
-                  value={activeHealth.workout}
-                  onChange={e => updateHealth('workout', e.target.value)}
-                  className="bg-secondary/30 border-white/5 rounded-xl h-14 text-sm font-bold text-foreground placeholder:text-muted-foreground/10 px-5"
-                />
-              </div>
+              <Input
+                placeholder="Session details..."
+                value={activeHealth.workout}
+                onChange={e => updateHealth('workout', e.target.value)}
+                className="bg-secondary/20 border-white/5 rounded-xl h-12 text-sm"
+              />
             </div>
 
-            <div className="glass-card p-8 animate-slide-up rounded-[2.5rem] relative overflow-hidden group border-white/5 hover:border-warning/30 transition-all duration-700 shadow-xl">
-              <div className="absolute -top-4 -right-4 p-10 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-125 transition-all duration-1000">
-                <Smile className="h-20 w-20 text-warning" />
-              </div>
-              <div className="flex items-center gap-4 mb-8 relative z-10">
-                <div className="p-4 rounded-2xl bg-warning/10 text-warning shadow-glow shadow-warning/10 transition-transform group-hover:scale-110">
-                  <Smile className="h-6 w-6" />
+            <div className="glass-card p-6 rounded-2xl border-white/5 hover:border-warning/20 transition-all">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-xl bg-warning/10 text-warning">
+                  <Smile className="h-5 w-5" />
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/60 uppercase">Neural State</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Mood</h3>
+                <span className="ml-auto text-2xl font-black text-warning">{activeHealth.mood}/10</span>
               </div>
-              <div className="space-y-8 relative z-10">
-                <Slider value={[activeHealth.mood]} onValueChange={([v]) => updateHealth('mood', v)} min={1} max={10} step={1} className="cursor-pointer" />
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Mood Index</span>
-                  <span className="text-4xl font-black tracking-tighter text-warning">{activeHealth.mood}/10</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card p-10 mt-12 animate-slide-up rounded-[3rem] border-white/5 overflow-hidden relative shadow-2xl">
-            <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none transform scale-150 grayscale rotate-6">
-              <BrainCircuit className="h-32 w-32" />
-            </div>
-
-            <div className="flex items-center gap-5 mb-12">
-              <div className="h-12 w-2 bg-primary rounded-full shadow-glow shadow-primary/20" />
-              <div>
-                <h3 className="text-2xl font-black uppercase tracking-tight text-foreground/90">System Integrity Analysis</h3>
-                <p className="text-[10px] uppercase font-bold text-muted-foreground/30 tracking-widest">7-Day Biometric Synthesis</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-12 relative z-10">
-              {(() => {
-                const weekHealth = health.filter(h => {
-                  const d = new Date(h.date);
-                  const now = new Date();
-                  return (now.getTime() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
-                });
-                const avg = (arr: number[]) => arr.length ? (arr.reduce((s, v) => s + v, 0) / arr.length).toFixed(1) : '—';
-                return (
-                  <>
-                    <div className="space-y-3 p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-indigo-500/20 transition-all duration-500">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Avg Sleep Cycle</div>
-                      <div className="text-4xl font-black tracking-tighter text-indigo-500">{avg(weekHealth.map(h => h.sleep))}h</div>
-                    </div>
-                    <div className="space-y-3 p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all duration-500">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Avg Hydration Level</div>
-                      <div className="text-4xl font-black tracking-tighter text-primary">{avg(weekHealth.map(h => h.water))}L</div>
-                    </div>
-                    <div className="space-y-3 p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-warning/20 transition-all duration-500">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Neuro Avg</div>
-                      <div className="text-4xl font-black tracking-tighter text-warning">{avg(weekHealth.map(h => h.mood))}/10</div>
-                    </div>
-                    <div className="space-y-3 p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-success/20 transition-all duration-500">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Training Count</div>
-                      <div className="text-4xl font-black tracking-tighter text-success">{weekHealth.filter(h => h.workout).length}</div>
-                    </div>
-                  </>
-                );
-              })()}
+              <Slider value={[activeHealth.mood]} onValueChange={([v]) => updateHealth('mood', v)} min={1} max={10} step={1} />
             </div>
           </div>
         </TabsContent>

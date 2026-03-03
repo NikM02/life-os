@@ -24,6 +24,8 @@ const INITIAL_SOPS: ContentSOP[] = CHANNELS.map(channel => ({
 }));
 
 import { useData } from '@/contexts/DataContext';
+import { exportContentDataToCSV } from '@/lib/export-utils';
+import { Download } from 'lucide-react';
 
 export default function ContentPipeline() {
     const { content: data, setContent: setData } = useData();
@@ -75,10 +77,19 @@ export default function ContentPipeline() {
                 description="Streamline your creative workflow from idea to hit video."
             >
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportContentDataToCSV(data.items)}
+                        className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+                    >
+                        <Download className="h-4 w-4" />
+                        Export Pipeline
+                    </Button>
                     <select
                         value={selectedChannel}
                         onChange={(e) => setSelectedChannel(e.target.value)}
-                        className="bg-secondary/40 border border-border/5 rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all appearance-none pr-10 cursor-pointer"
+                        className="bg-secondary/40 border border-border/5 rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all appearance-none pr-10 cursor-pointer h-10"
                     >
                         <option value="All">All Content</option>
                         {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
