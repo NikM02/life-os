@@ -7,12 +7,12 @@ interface SplashScreenProps {
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
-  const [pin, setPin] = useState(['', '', '', '', '', '', '']);
+  const [pin, setPin] = useState(['', '', '', '']);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const CORRECT_PIN = '1670651';
+  const CORRECT_PIN = '2368';
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -21,7 +21,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
     newPin[index] = value.slice(-1);
     setPin(newPin);
 
-    if (value && index < 6) {
+    if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -43,7 +43,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
       } else {
         setError(true);
         setTimeout(() => {
-          setPin(['', '', '', '', '', '', '']);
+          setPin(['', '', '', '']);
           setError(false);
           inputRefs.current[0]?.focus();
         }, 800);
@@ -75,7 +75,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
           </div>
         </div>
 
-        <div className="flex gap-4 sm:gap-6 mb-16 h-20 items-center">
+        <div className="flex gap-6 mb-16 h-20 items-center">
           {pin.map((digit, i) => (
             <div
               key={i}
@@ -83,7 +83,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className={cn(
-                "w-12 h-16 sm:w-14 sm:h-18 rounded-2xl border border-dotted border-white/20 bg-transparent flex items-center justify-center transition-all duration-700 relative overflow-hidden",
+                "w-16 h-20 sm:w-20 sm:h-24 rounded-3xl border border-dotted border-white/20 bg-transparent flex items-center justify-center transition-all duration-700 relative overflow-hidden",
                 digit ? "border-white/40" : "border-white/10",
                 inputRefs.current[i] === document.activeElement && "border-white/60",
                 error && "animate-shake border-destructive/50"
@@ -97,35 +97,19 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
                   onKeyDown={e => handleKeyDown(i, e)}
                   spellCheck={false}
                   autoComplete="off"
-                  className="absolute inset-0 w-full h-full text-center text-3xl font-light bg-transparent focus:outline-none caret-transparent text-transparent z-10 cursor-default"
+                  className="absolute inset-0 w-full h-full text-center text-4xl font-light bg-transparent focus:outline-none caret-transparent text-transparent z-10 cursor-default"
                   autoFocus={i === 0}
                 />
 
-                {/* Vertical Roller - High Visibility */}
-                <div className="flex flex-col items-center justify-center h-full pointer-events-none">
-                  <div
-                    className="flex flex-col items-center transition-transform duration-[1200ms] cubic-bezier(0.2, 1, 0.4, 1)"
-                    style={{
-                      transform: digit
-                        ? `translateY(calc(-${parseInt(digit)} * 3rem))`
-                        : 'translateY(0)'
-                    }}
-                  >
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                      <span
-                        key={num}
-                        className={cn(
-                          "h-12 w-full text-3xl font-light flex items-center justify-center transition-colors duration-500",
-                          digit === String(num) ? "text-white opacity-100" : "text-white/5 opacity-5"
-                        )}
-                      >
-                        {num}
-                      </span>
-                    ))}
-                    {!digit && (
-                      <span className="h-12 text-white/10 flex items-center justify-center opacity-30">•</span>
-                    )}
-                  </div>
+                {/* Simplified High-Visibility Entry */}
+                <div className="flex items-center justify-center h-full pointer-events-none">
+                  {digit ? (
+                    <span className="text-4xl font-light text-white animate-in zoom-in-50 fade-in duration-300">
+                      {digit}
+                    </span>
+                  ) : (
+                    <span className="text-white/10 opacity-30 animate-pulse text-2xl">•</span>
+                  )}
                 </div>
               </div>
             </div>
