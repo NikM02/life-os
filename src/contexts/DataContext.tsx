@@ -36,6 +36,7 @@ interface DataContextType {
     setReflections: (data: DailyReflection[]) => void;
     user: any | null;
     pushAllToCloud: () => Promise<void>;
+    pullFromCloud: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -103,77 +104,77 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         return camel;
     };
 
-    // Fetch initial data from Supabase once logged in
-    React.useEffect(() => {
+    const pullFromCloud = async () => {
         if (!user) {
             setIsInitialLoadDone(false);
             return;
         }
 
-        const loadSupabaseData = async () => {
-            const tables = ['vision', 'goals', 'execution', 'transactions', 'investments', 'budgets', 'content', 'library', 'habits', 'health', 'blocks', 'reviews', 'reflections'];
+        const tables = ['vision', 'goals', 'execution', 'transactions', 'investments', 'budgets', 'content', 'library', 'habits', 'health', 'blocks', 'reviews', 'reflections'];
 
-            for (const table of tables) {
-                const { data, error } = await supabase
-                    .from(table)
-                    .select('*')
-                    .eq('user_id', user.id);
+        for (const table of tables) {
+            const { data, error } = await supabase
+                .from(table)
+                .select('*')
+                .eq('user_id', user.id);
 
-                if (data && !error) {
-                    if (data.length > 0) {
-                        // Data exists in Supabase, load it
-                        const mappedData = data.map(item => toCamelCase(item));
-                        switch (table) {
-                            case 'vision': if (data[0]) setVision(data[0].data); break;
-                            case 'goals': setGoals(mappedData); break;
-                            case 'execution': if (data[0]) setExecution(data[0].data); break;
-                            case 'transactions': setTransactions(mappedData); break;
-                            case 'investments': setInvestments(mappedData); break;
-                            case 'budgets': setBudgets(mappedData); break;
-                            case 'content': if (data[0]) setContent(data[0].data); break;
-                            case 'library': setLibrary(mappedData); break;
-                            case 'habits': setHabits(mappedData); break;
-                            case 'health': setHealth(mappedData); break;
-                            case 'blocks': setBlocks(mappedData); break;
-                            case 'reviews': setReviews(mappedData); break;
-                            case 'reflections': setReflections(mappedData); break;
-                        }
-                    } else {
-                        // Table is empty in Supabase, check if we have local data to push
-                        let localData: any = null;
-                        let isArray = true;
-                        switch (table) {
-                            case 'vision': localData = vision; isArray = false; break;
-                            case 'goals': localData = goals; break;
-                            case 'execution': localData = execution; isArray = false; break;
-                            case 'transactions': localData = transactions; break;
-                            case 'investments': localData = investments; break;
-                            case 'budgets': localData = budgets; break;
-                            case 'content': localData = content; isArray = false; break;
-                            case 'library': localData = library; break;
-                            case 'habits': localData = habits; break;
-                            case 'health': localData = health; break;
-                            case 'blocks': localData = blocks; break;
-                            case 'reviews': localData = reviews; break;
-                            case 'reflections': localData = reflections; break;
-                        }
+            if (data && !error) {
+                if (data.length > 0) {
+                    // Data exists in Supabase, load it
+                    const mappedData = data.map(item => toCamelCase(item));
+                    switch (table) {
+                        case 'vision': if (data[0]) setVision(data[0].data); break;
+                        case 'goals': setGoals(mappedData); break;
+                        case 'execution': if (data[0]) setExecution(data[0].data); break;
+                        case 'transactions': setTransactions(mappedData); break;
+                        case 'investments': setInvestments(mappedData); break;
+                        case 'budgets': setBudgets(mappedData); break;
+                        case 'content': if (data[0]) setContent(data[0].data); break;
+                        case 'library': setLibrary(mappedData); break;
+                        case 'habits': setHabits(mappedData); break;
+                        case 'health': setHealth(mappedData); break;
+                        case 'blocks': setBlocks(mappedData); break;
+                        case 'reviews': setReviews(mappedData); break;
+                        case 'reflections': setReflections(mappedData); break;
+                    }
+                } else {
+                    // Table is empty in Supabase, check if we have local data to push
+                    let localData: any = null;
+                    let isArray = true;
+                    switch (table) {
+                        case 'vision': localData = vision; isArray = false; break;
+                        case 'goals': localData = goals; break;
+                        case 'execution': localData = execution; isArray = false; break;
+                        case 'transactions': localData = transactions; break;
+                        case 'investments': localData = investments; break;
+                        case 'budgets': localData = budgets; break;
+                        case 'content': localData = content; isArray = false; break;
+                        case 'library': localData = library; break;
+                        case 'habits': localData = habits; break;
+                        case 'health': localData = health; break;
+                        case 'blocks': localData = blocks; break;
+                        case 'reviews': localData = reviews; break;
+                        case 'reflections': localData = reflections; break;
+                    }
 
-                        if (localData && (isArray ? localData.length > 0 : Object.keys(localData).length > 0)) {
-                            console.log(`Initial push for table ${table}`);
-                            if (isArray) {
-                                const snakeData = localData.map((item: any) => ({ ...toSnakeCase(item), user_id: user.id }));
-                                await supabase.from(table).insert(snakeData);
-                            } else {
-                                await supabase.from(table).upsert({ user_id: user.id, data: localData, updated_at: new Date().toISOString() });
-                            }
+                    if (localData && (isArray ? localData.length > 0 : Object.keys(localData).length > 0)) {
+                        console.log(`Initial push for table ${table}`);
+                        if (isArray) {
+                            const snakeData = localData.map((item: any) => ({ ...toSnakeCase(item), user_id: user.id }));
+                            await supabase.from(table).insert(snakeData);
+                        } else {
+                            await supabase.from(table).upsert({ user_id: user.id, data: localData, updated_at: new Date().toISOString() });
                         }
                     }
                 }
             }
-            setIsInitialLoadDone(true);
-        };
+        }
+        setIsInitialLoadDone(true);
+    };
 
-        loadSupabaseData();
+    // Fetch initial data from Supabase once logged in
+    React.useEffect(() => {
+        pullFromCloud();
     }, [user]);
 
     // Sync helpers (generic upsert)
@@ -245,7 +246,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             reviews, setReviews,
             reflections, setReflections,
             user,
-            pushAllToCloud
+            pushAllToCloud,
+            pullFromCloud
         }}>
             {children}
         </DataContext.Provider>

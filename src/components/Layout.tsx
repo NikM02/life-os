@@ -16,19 +16,27 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [isDark, setIsDark] = useLocalStorage('lifeos-dark', true);
 
-  const { user, pushAllToCloud } = useData();
+  const { user, pushAllToCloud, pullFromCloud } = useData();
   const [syncing, setSyncing] = React.useState(false);
+  const [pulling, setPulling] = React.useState(false);
   const [showAuth, setShowAuth] = React.useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
 
-  const handleSync = async () => {
+  const handlePush = async () => {
     if (!user) return;
     setSyncing(true);
     await pushAllToCloud();
     setSyncing(false);
+  };
+
+  const handlePull = async () => {
+    if (!user) return;
+    setPulling(true);
+    await pullFromCloud();
+    setPulling(false);
   };
 
   return (
@@ -45,19 +53,36 @@ export function Layout({ children }: LayoutProps) {
 
             <div className="flex items-center gap-3">
               {user ? (
-                <button
-                  onClick={handleSync}
-                  disabled={syncing}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-1.5 rounded-xl text-[11px] font-bold transition-all border",
-                    syncing
-                      ? "bg-primary/10 text-primary border-primary/20 animate-pulse"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/80 border-border/40 hover:border-border"
-                  )}
-                >
-                  <Cloud className={cn("h-3.5 w-3.5", syncing && "animate-bounce")} />
-                  <span>{syncing ? 'Syncing...' : 'Sync'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePush}
+                    disabled={syncing || pulling}
+                    title="Push to Cloud"
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border",
+                      syncing
+                        ? "bg-primary/10 text-primary border-primary/20 animate-pulse"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/80 border-border/40 hover:border-border"
+                    )}
+                  >
+                    <Cloud className={cn("h-3.5 w-3.5", syncing && "animate-bounce")} />
+                    <span className="hidden xs:inline">{syncing ? 'Pushing...' : 'Push'}</span>
+                  </button>
+                  <button
+                    onClick={handlePull}
+                    disabled={syncing || pulling}
+                    title="Pull from Cloud"
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border",
+                      pulling
+                        ? "bg-primary/10 text-primary border-primary/20 animate-pulse"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/80 border-border/40 hover:border-border"
+                    )}
+                  >
+                    <Download className={cn("h-3.5 w-3.5", pulling && "animate-bounce")} />
+                    <span className="hidden xs:inline">{pulling ? 'Pulling...' : 'Pull'}</span>
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => setShowAuth(true)}
@@ -86,7 +111,7 @@ export function Layout({ children }: LayoutProps) {
               </button>
             </div>
           </header>
-          <main className="flex-1 p-6 md:p-10 lg:p-12 max-w-[1600px] mx-auto w-full overflow-auto">
+          <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full overflow-auto">
             {children}
           </main>
         </div>
