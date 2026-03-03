@@ -72,10 +72,10 @@ export function AppSidebar() {
         {user && (
           <Link
             to="/logout"
-            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/5 border border-destructive/10 hover:border-destructive/20 transition-all group shadow-sm active:scale-95"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 border border-destructive/20 transition-all group shadow-sm active:scale-95"
           >
-            <ShieldAlert className="h-4 w-4 transition-transform group-hover:scale-110" />
-            <span>Terminate Session</span>
+            <LogOut className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <span>Secure Logout</span>
           </Link>
         )}
       </div>

@@ -6,9 +6,10 @@ import { ShieldCheck, Lock, Mail, Loader2, Chrome } from 'lucide-react';
 
 export default function SupabaseAuth() {
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState('inik7713@gmail.com');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
+    const [signupSuccess, setSignupSuccess] = useState(false);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,21 +19,13 @@ export default function SupabaseAuth() {
             if (isSignUp) {
                 const { error } = await supabase.auth.signUp({ email, password });
                 if (error) throw error;
-                alert('Check your email for the confirmation link!');
+                setSignupSuccess(true);
             } else {
-                if (email === 'inik7713@gmail.com' && password === 'admin123') {
-                    const { error } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (error) throw error;
-                } else {
-                    const { error } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (error) throw error;
-                }
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                if (error) throw error;
             }
         } catch (error: any) {
             alert(error.message);
@@ -57,6 +50,37 @@ export default function SupabaseAuth() {
             setLoading(false);
         }
     };
+
+    if (signupSuccess) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center p-6">
+                <div className="glass-card p-10 w-full max-w-md rounded-3xl border-primary/10 text-center space-y-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none transform scale-150 rotate-12">
+                        <Mail className="h-32 w-32 text-primary" />
+                    </div>
+                    <div className="relative z-10 space-y-6">
+                        <div className="flex justify-center">
+                            <div className="p-4 rounded-full bg-primary/10 border border-primary/20 animate-pulse">
+                                <Mail className="h-8 w-8 text-primary shadow-glow shadow-primary/40" />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-2xl font-black tracking-tighter uppercase italic">Verification Sent</h2>
+                            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed">
+                                Security check initiated. <br />Please validate your access via email.
+                            </p>
+                        </div>
+                        <Button
+                            onClick={() => setSignupSuccess(false)}
+                            className="w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest mt-4"
+                        >
+                            Return to Port
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-6">
@@ -122,7 +146,7 @@ export default function SupabaseAuth() {
                             <span className="w-full border-t border-primary/5"></span>
                         </div>
                         <div className="relative flex justify-center text-[8px] uppercase font-black tracking-[0.3em]">
-                            <span className="bg-background px-4 text-muted-foreground/30">Or Connect via Cloud</span>
+                            <span className="bg-background px-4 text-muted-foreground/30">Or Secure with Cloud</span>
                         </div>
                     </div>
 
@@ -133,7 +157,7 @@ export default function SupabaseAuth() {
                         disabled={loading}
                     >
                         <Chrome className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-                        Sync with Google
+                        Continue with Google
                     </Button>
 
                     <div className="pt-4">
