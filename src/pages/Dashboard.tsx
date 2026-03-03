@@ -43,159 +43,93 @@ export default function Dashboard() {
   const [executionEmblaRef] = useEmblaCarousel({ align: 'start', loop: false });
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-32 animate-fade-in px-4">
-      {/* Vision Card */}
-      <section className="relative overflow-hidden group">
-        <Link to="/vision" className="block">
-          <div className="glass-card p-10 rounded-[3rem] border-primary/10 bg-primary/[0.01] hover:bg-primary/[0.03] transition-all duration-500 relative overflow-hidden group/card">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
-              <div className="space-y-4 max-w-2xl">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary/60">Core Vision</span>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground leading-tight">
-                  {vision?.oneYearVision || "Design your existence. Define your trajectory."}
-                </h1>
-              </div>
-            </div>
-          </div>
+    <div className="max-w-6xl mx-auto space-y-16 pb-32 animate-fade-in px-4 pt-10">
+      {/* Reduced Vision Heading */}
+      <section className="border-b border-border/10 pb-10">
+        <Link to="/vision" className="group block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground/30 mb-4 block">Current Directive</span>
+          <h1 className="text-xl md:text-2xl font-black tracking-tight text-foreground/90 leading-tight transition-all group-hover:text-primary">
+            {vision?.oneYearVision || "Design your existence. Define your trajectory."}
+          </h1>
         </Link>
       </section>
 
-      {/* Health & Habits */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Health & Habits</h2>
-          </div>
-          <Link to="/habits" className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/30 hover:text-primary transition-colors">Adjust</Link>
+      {/* Health & Habits - Compact Bar */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40">Biological State</h2>
+          <Link to="/habits" className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/20 hover:text-primary">Details</Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-          <div className="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-blue-500/20 transition-all">
-            <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500"><Moon className="h-5 w-5" /></div>
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Sleep</div>
-              <div className="text-xl font-black">{todayHealth.sleep}h</div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {[
+            { label: 'Sleep', value: `${todayHealth.sleep}h`, icon: Moon, color: 'text-blue-500' },
+            { label: 'Water', value: `${todayHealth.water}L`, icon: Droplets, color: 'text-primary' },
+            { label: 'Activity', value: todayHealth.workout || 'Nominal', icon: Flame, color: 'text-success' },
+            { label: 'Neuro', value: `${todayHealth.mood}/10`, icon: Smile, color: 'text-warning' },
+            { label: 'Journal', value: todayReflection ? 'Captured' : 'Pending', icon: BrainCircuit, color: 'text-primary' }
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col gap-1 p-4 bg-secondary/5 rounded-2xl border border-border/10">
+              <div className="flex items-center gap-2 opacity-30">
+                <item.icon className="h-3 w-3" />
+                <span className="text-[8px] font-bold uppercase tracking-widest">{item.label}</span>
+              </div>
+              <span className="text-sm font-black tracking-tight">{item.value}</span>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Finance - Minimal Grid */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40">Resources</h2>
+          <Link to="/finance" className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/20 hover:text-emerald-500">Terminal</Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 bg-secondary/5 rounded-3xl border border-border/10">
+          <div className="space-y-1">
+            <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Equity</span>
+            <div className="text-2xl font-black tracking-tighter">{formatCurrency(balance)}</div>
           </div>
-          <div className="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-primary/20 transition-all">
-            <div className="p-3 rounded-2xl bg-primary/10 text-primary"><Droplets className="h-5 w-5" /></div>
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Hydration</div>
-              <div className="text-xl font-black">{todayHealth.water}L</div>
-            </div>
+          <div className="space-y-1 md:border-l md:border-border/10 md:pl-8">
+            <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Inflow</span>
+            <div className="text-xl font-black text-emerald-500/80 tracking-tighter">{formatCurrency(totalIncome)}</div>
           </div>
-          <div className="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-success/20 transition-all">
-            <div className="p-3 rounded-2xl bg-success/10 text-success"><Flame className="h-5 w-5" /></div>
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Status</div>
-              <div className="text-xs font-bold truncate max-w-[80px]">{todayHealth.workout || "Inactive"}</div>
-            </div>
-          </div>
-          <div className="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-warning/20 transition-all">
-            <div className="p-3 rounded-2xl bg-warning/10 text-warning"><Smile className="h-5 w-5" /></div>
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Neuro</div>
-              <div className="text-xl font-black">{todayHealth.mood}/10</div>
-            </div>
-          </div>
-          <div className="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-primary/20 transition-all border-primary/10 bg-primary/[0.02]">
-            <div className="p-3 rounded-2xl bg-primary/10 text-primary">
-              <BrainCircuit className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 flex items-center gap-1.5">Journal {todayReflection && <CheckCircle2 className="h-2.5 w-2.5 text-primary" />}</div>
-              <div className="text-xs font-bold">{todayReflection ? "Captured" : "Pending"}</div>
-            </div>
+          <div className="space-y-1 md:border-l md:border-border/10 md:pl-8">
+            <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Outflow</span>
+            <div className="text-xl font-black text-red-500/80 tracking-tighter">{formatCurrency(totalExpenses)}</div>
           </div>
         </div>
       </section>
 
-      {/* Finance */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Resource Management</h2>
-          </div>
-          <Link to="/finance" className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/30 hover:text-emerald-500 transition-colors">Finance Terminal</Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card p-8 rounded-[2rem] relative overflow-hidden group hover:border-emerald-500/10 transition-all duration-500">
-            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 mb-2">Available Balance</div>
-            <div className="text-3xl font-black tracking-tighter text-foreground mb-4">{formatCurrency(balance)}</div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-500/70 bg-emerald-500/5 w-fit px-3 py-1 rounded-full border border-emerald-500/5">
-              <ArrowUpRight className="h-3 w-3" /> Optimal
-            </div>
-          </div>
-
-          <div className="glass-card p-8 rounded-[2rem] flex flex-col justify-center gap-5 group hover:border-blue-500/10 transition-all duration-500">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Inflow</div>
-                <div className="text-xl font-black text-emerald-500 tracking-tighter flex items-center gap-1.5">
-                  <TrendingUp className="h-4 w-4" /> {formatCurrency(totalIncome)}
-                </div>
-              </div>
-              <div className="space-y-1 text-right">
-                <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Outflow</div>
-                <div className="text-xl font-black text-red-500 tracking-tighter flex items-center gap-1.5 uppercase">
-                  {formatCurrency(totalExpenses)} <TrendingDown className="h-4 w-4" />
-                </div>
-              </div>
-            </div>
-            <ProgressBar value={totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0} className="h-2 bg-secondary/20" />
-            <div className="text-[8px] font-bold text-muted-foreground/30 uppercase tracking-widest text-center">Ratio: {totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0}%</div>
-          </div>
-
-          <div className="glass-card p-6 rounded-[2rem] flex flex-col justify-center items-center text-center hover:border-primary/10 transition-all duration-500">
-            <div className="p-4 rounded-2xl bg-secondary/10 mb-3 grayscale opacity-30">
-              <Layers className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <h3 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">System Status</h3>
-            <p className="text-[8px] font-medium text-muted-foreground/30 uppercase tracking-widest">Nominal</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Active Missions */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Active Missions</h2>
-          </div>
-          <Link to="/goals" className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/30 hover:text-primary transition-colors">Manifest</Link>
+      {/* Missions - Minimal Cards */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40">Critical Objectives</h2>
+          <Link to="/goals" className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/20 hover:text-primary">Manifest</Link>
         </div>
 
         <div className="embla overflow-hidden" ref={missionsEmblaRef}>
           <div className="embla__container flex gap-6">
             {(!goals || goals.filter(g => g.status !== 'Completed').length === 0) ? (
-              <div className="embla__slide flex-[0_0_100%]">
-                <div className="glass-card p-16 rounded-[3rem] text-center border-dashed border-white/5 opacity-40">
-                  <Target className="h-12 w-12 mx-auto mb-6 text-muted-foreground/20" />
-                  <p className="text-sm font-black uppercase tracking-widest text-muted-foreground/40">No active high-impact missions</p>
-                </div>
+              <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/20 p-12 rounded-3xl text-center opacity-30">
+                <span className="text-[9px] font-bold uppercase tracking-widest">No active objectives</span>
               </div>
             ) : (
               goals.filter(g => g.status !== 'Completed').map(goal => (
-                <div key={goal.id} className="embla__slide flex-[0_0_85%] md:flex-[0_0_30%]">
-                  <div className="glass-card p-10 rounded-[2.5rem] h-full flex flex-col justify-between hover:border-primary/30 transition-all duration-700 shadow-xl group">
+                <div key={goal.id} className="embla__slide flex-[0_0_80%] md:flex-[0_0_30%]">
+                  <div className="bg-background border border-border/20 p-6 rounded-3xl h-full flex flex-col justify-between hover:border-primary/40 transition-colors group">
                     <div>
-                      <div className="flex justify-between items-start mb-6">
-                        <CategoryBadge category={goal.category} />
-                        <span className="text-[8px] font-black uppercase tracking-widest text-primary/40 px-2 py-1 bg-primary/5 rounded-lg border border-primary/10">{goal.timeframe}</span>
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">{goal.category}</span>
+                        <span className="text-[7px] font-bold uppercase tracking-widest text-primary opacity-40">{goal.timeframe}</span>
                       </div>
-                      <h3 className="text-xl font-black tracking-tight mb-3 group-hover:text-primary transition-colors leading-tight">{goal.title}</h3>
-                      <p className="text-xs font-medium text-muted-foreground/60 leading-relaxed italic line-clamp-2">{goal.description}</p>
+                      <h3 className="text-base font-black tracking-tight mb-2 group-hover:text-primary transition-colors">{goal.title}</h3>
                     </div>
-
-                    <div className="mt-8 space-y-4">
-                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-muted-foreground/20">
-                        <span>Progress</span>
-                        <span className="text-primary">{goal.progress}%</span>
-                      </div>
-                      <ProgressBar value={goal.progress} className="h-2 bg-secondary/30" />
+                    <div className="mt-4 flex items-center justify-between text-[8px] font-bold uppercase tracking-widest">
+                      <span className="text-muted-foreground/20">Progress</span>
+                      <span>{goal.progress}%</span>
                     </div>
                   </div>
                 </div>
@@ -205,45 +139,31 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Execution Tracker */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Daily Tasks</h2>
-          </div>
-          <Link to="/execution" className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/30 hover:text-orange-500 transition-colors">Queue</Link>
+      {/* Tasks - Subtle List */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40">Execution Queue</h2>
+          <Link to="/execution" className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/20 hover:text-orange-500">Full Queue</Link>
         </div>
 
         <div className="embla overflow-hidden" ref={executionEmblaRef}>
           <div className="embla__container flex gap-6">
             {(!execution || !execution.tasks || execution.tasks.filter(e => e.status !== 'Done').length === 0) ? (
-              <div className="embla__slide flex-[0_0_100%]">
-                <div className="glass-card p-16 rounded-[3rem] text-center border-dashed border-white/5 opacity-40">
-                  <Layers className="h-12 w-12 mx-auto mb-6 text-muted-foreground/20" />
-                  <p className="text-sm font-black uppercase tracking-widest text-muted-foreground/40">Task queue empty. System optimized.</p>
-                </div>
+              <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/20 p-12 rounded-3xl text-center opacity-30">
+                <span className="text-[9px] font-bold uppercase tracking-widest">System optimized</span>
               </div>
             ) : (
               execution.tasks.filter(e => e.status !== 'Done').map(item => (
-                <div key={item.id} className="embla__slide flex-[0_0_85%] md:flex-[0_0_40%]">
-                  <div className="glass-card p-10 rounded-[2.5rem] h-full flex flex-col justify-between hover:border-orange-500/30 transition-all duration-700 shadow-xl group border-l-4 border-l-transparent hover:border-l-orange-500">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-500">
-                        <Target className="h-4 w-4" />
-                      </div>
-                      <div className={cn(
-                        "text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border",
-                        item.priority === 'High' ? "bg-red-500/10 border-red-500/20 text-red-500" : "bg-white/5 border-white/5 text-muted-foreground/40"
-                      )}>
-                        {item.priority}
-                      </div>
+                <div key={item.id} className="embla__slide flex-[0_0_80%] md:flex-[0_0_35%]">
+                  <div className="bg-secondary/5 border border-border/20 p-6 rounded-3xl h-full hover:border-orange-500/40 transition-colors group">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={cn(
+                        "text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded border",
+                        item.priority === 'High' ? "border-red-500/30 text-red-500/60" : "border-border/30 text-muted-foreground/30"
+                      )}>{item.priority}</span>
+                      <span className="text-[7px] font-bold text-muted-foreground/20 uppercase tracking-widest">{item.dueDate || 'ASAP'}</span>
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-black tracking-tight group-hover:text-orange-500 transition-colors">{item.content}</h3>
-                      <div className="flex items-center gap-3 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-                        <span>{item.dueDate || 'No Deadline'}</span>
-                      </div>
-                    </div>
+                    <h3 className="text-sm font-black tracking-tight group-hover:text-orange-500 transition-colors uppercase">{item.content}</h3>
                   </div>
                 </div>
               ))

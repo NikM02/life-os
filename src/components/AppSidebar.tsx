@@ -29,8 +29,8 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border bg-sidebar-background transition-all duration-300">
       <div className="p-6 pb-4">
         <Link to="/dashboard" className="flex items-center gap-4 mb-2 group">
-          <h1 className="text-xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col">
-            LifeOS
+          <h1 className="text-xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col uppercase">
+            NOS
           </h1>
         </Link>
       </div>
