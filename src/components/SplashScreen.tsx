@@ -75,17 +75,18 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
           </div>
         </div>
 
-        <div className="flex gap-4 sm:gap-6 mb-12">
+        <div className="flex gap-4 sm:gap-6 mb-16 h-20 items-center">
           {pin.map((digit, i) => (
             <div
               key={i}
-              className="relative animate-in slide-in-from-bottom-8 duration-700"
+              className="relative animate-in fade-in slide-in-from-bottom-12 duration-1000"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className={cn(
-                "w-12 h-16 sm:w-14 sm:h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 overflow-hidden",
-                digit ? "border-white/90 bg-white/10" : "border-white/10 bg-white/5 group-hover:border-white/20",
-                error && "border-destructive/50 bg-destructive/5"
+                "w-12 h-16 sm:w-14 sm:h-18 rounded-2xl border border-dotted border-white/20 bg-transparent flex items-center justify-center transition-all duration-700 relative overflow-hidden",
+                digit ? "border-white/40" : "border-white/10",
+                inputRefs.current[i] === document.activeElement && "border-white/60",
+                error && "animate-shake border-destructive/50"
               )}>
                 <input
                   ref={el => inputRefs.current[i] = el}
@@ -96,23 +97,36 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
                   onKeyDown={e => handleKeyDown(i, e)}
                   spellCheck={false}
                   autoComplete="off"
-                  className={cn(
-                    "absolute inset-0 w-full h-full text-center text-2xl font-medium bg-transparent focus:outline-none transition-all text-white",
-                    error && "text-destructive animate-shake"
-                  )}
+                  className="absolute inset-0 w-full h-full text-center text-3xl font-light bg-transparent focus:outline-none caret-transparent text-transparent z-10 cursor-default"
                   autoFocus={i === 0}
                 />
-                {/* Telegram-style fill animation */}
-                <div className={cn(
-                  "w-3 h-3 rounded-full bg-white transition-all duration-300 ease-out transform pointer-events-none",
-                  digit ? "scale-[2.5] opacity-0" : "scale-0 opacity-0",
-                  digit && !error && "animate-ping opacity-20"
-                )} />
-                {digit && !error && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-in zoom-in-50 duration-300">
-                    <span className="text-2xl font-medium text-white">•</span>
+
+                {/* Vertical Roller - High Visibility */}
+                <div className="flex flex-col items-center justify-center h-full pointer-events-none">
+                  <div
+                    className="flex flex-col items-center transition-transform duration-[1200ms] cubic-bezier(0.2, 1, 0.4, 1)"
+                    style={{
+                      transform: digit
+                        ? `translateY(calc(-${parseInt(digit)} * 3rem))`
+                        : 'translateY(0)'
+                    }}
+                  >
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                      <span
+                        key={num}
+                        className={cn(
+                          "h-12 w-full text-3xl font-light flex items-center justify-center transition-colors duration-500",
+                          digit === String(num) ? "text-white opacity-100" : "text-white/5 opacity-5"
+                        )}
+                      >
+                        {num}
+                      </span>
+                    ))}
+                    {!digit && (
+                      <span className="h-12 text-white/10 flex items-center justify-center opacity-30">•</span>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           ))}
