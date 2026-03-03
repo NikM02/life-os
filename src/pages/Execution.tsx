@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
-    Layers, Plus, Filter, MoreVertical, Calendar,
-    BarChart3, CheckCircle2, Clock, PlayCircle, TrendingUp, Trash2, Edit2, Timer
+    Layers, Plus, CheckCircle2, PlayCircle, TrendingUp, Trash2, Edit2, Timer, Download, Calendar, BarChart3
 } from 'lucide-react';
 import { PageHeader, StatCard, ProgressBar, Button } from '@/components/shared';
 import { useData } from '@/contexts/DataContext';
@@ -9,13 +8,6 @@ import { KanbanTask, KanbanColumn, ExecutionData } from '@/types/lifeos';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { exportExecutionDataToCSV } from '@/lib/export-utils';
-import { Download } from 'lucide-react';
-
-const INITIAL_COLUMNS: KanbanColumn[] = [
-    { id: 'todo', title: 'To Do' },
-    { id: 'in-progress', title: 'In Progress' },
-    { id: 'done', title: 'Done' }
-];
 
 export default function Execution() {
     const { execution, setExecution } = useData();
@@ -50,24 +42,23 @@ export default function Execution() {
     };
 
     return (
-        <div className="animate-fade-in max-w-7xl mx-auto pb-10 px-4 md:px-0">
+        <div className="animate-fade-in max-w-7xl mx-auto pb-32 px-4 shadow-none">
             <PageHeader
-                title="Daily Execution"
-                description="Ship your dreams. Turn goals into reality through consistent action."
+                title="Execution"
+                description="Convert intent into tangible output."
             >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => exportExecutionDataToCSV(data.tasks)}
-                        className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+                        className="h-9 px-4 rounded-xl opacity-40 hover:opacity-100"
                     >
-                        <Download className="h-4 w-4" />
-                        Export Tasks
+                        <Download size={14} className="mr-2" /> Export
                     </Button>
                     <Button
                         onClick={() => setEditingTask({
-                            id: Math.random().toString(36).substr(2, 9),
+                            id: crypto.randomUUID(),
                             content: '',
                             status: 'todo',
                             priority: 'Medium',
@@ -75,21 +66,23 @@ export default function Execution() {
                             createdAt: new Date().toISOString(),
                             linkedIds: []
                         })}
-                        variant="primary"
+                        variant="outline"
+                        size="sm"
+                        className="h-9 px-4 rounded-xl border-border/10"
                     >
-                        <Plus className="h-4 w-4" /> New Task
+                        <Plus size={14} className="mr-2" /> New Task
                     </Button>
                 </div>
             </PageHeader>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <StatCard label="Total Tasks" value={stats.total} icon={<Layers className="h-4 w-4" />} />
-                <StatCard label="Active" value={stats.inProgress} icon={<PlayCircle className="h-4 w-4" />} />
-                <StatCard label="Completed" value={stats.done} icon={<CheckCircle2 className="h-4 w-4" />} />
-                <StatCard label="Progress" value={`${stats.progress}%`} icon={<BarChart3 className="h-4 w-4" />} />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                <StatCard label="Input" value={stats.total} icon={<Layers />} />
+                <StatCard label="Active" value={stats.inProgress} icon={<PlayCircle />} className="bg-primary/5" />
+                <StatCard label="Output" value={stats.done} icon={<CheckCircle2 />} />
+                <StatCard label="Rate" value={`${stats.progress}%`} icon={<BarChart3 />} />
             </div>
 
-            <div className="grid grid-cols-1 gap-12">
+            <div className="space-y-20">
                 <KanbanBoard
                     data={data}
                     setData={setData}
@@ -146,27 +139,23 @@ function KanbanBoard({ data, setData, onEditTask }: {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {data.columns.map(column => (
                 <div
                     key={column.id}
                     onDragOver={onDragOver}
                     onDrop={(e) => onDrop(e, column.id)}
-                    className="flex flex-col gap-6"
+                    className="flex flex-col gap-8"
                 >
-                    <div className="flex items-center justify-between px-2">
-                        <div className="flex items-center gap-3">
-                            <div className={cn(
-                                "w-2.5 h-2.5 rounded-full",
-                                column.id === 'todo' ? "bg-muted-foreground/30" :
-                                    column.id === 'in-progress' ? "bg-primary shadow-glow shadow-primary/50" :
-                                        "bg-success shadow-glow shadow-success/50"
-                            )} />
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">{column.title}</h3>
-                            <span className="px-2 py-0.5 rounded-lg bg-secondary/50 text-[10px] font-bold text-muted-foreground/40">
-                                {data.tasks.filter(t => t.status === column.id).length}
-                            </span>
-                        </div>
+                    <div className="flex items-center gap-3 px-1 opacity-30">
+                        <div className={cn(
+                            "w-1.5 h-1.5 rounded-full",
+                            column.id === 'todo' ? "bg-muted-foreground" :
+                                column.id === 'in-progress' ? "bg-primary" :
+                                    "bg-success"
+                        )} />
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em]">{column.title}</h3>
+                        <span className="text-[8px] font-bold">{data.tasks.filter(t => t.status === column.id).length}</span>
                     </div>
 
                     <div className="flex-1 flex flex-col gap-4 min-h-[400px]">
@@ -178,52 +167,35 @@ function KanbanBoard({ data, setData, onEditTask }: {
                                     draggable
                                     onDragStart={(e) => onDragStart(e, task.id)}
                                     className={cn(
-                                        "glass-card p-5 cursor-grab active:cursor-grabbing hover:border-primary/40 transition-all group relative",
-                                        draggedTaskId === task.id && "opacity-40 grayscale-[0.5]"
+                                        "bg-background border border-border/10 p-5 rounded-2xl cursor-grab active:cursor-grabbing hover:bg-secondary/5 transition-all group",
+                                        draggedTaskId === task.id && "opacity-40"
                                     )}
                                 >
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className={cn(
-                                            "px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
-                                            task.priority === 'High' ? "bg-destructive/10 text-destructive border-destructive/20" :
-                                                task.priority === 'Medium' ? "bg-warning/10 text-warning border-warning/20" :
-                                                    "bg-success/10 text-success border-success/20"
+                                        <span className={cn(
+                                            "text-[7px] font-black uppercase tracking-widest",
+                                            task.priority === 'High' ? "text-destructive" :
+                                                task.priority === 'Medium' ? "text-warning" :
+                                                    "text-success"
                                         )}>
                                             {task.priority}
-                                        </div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                            <button
-                                                onClick={() => onEditTask(task)}
-                                                className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground/40 hover:text-foreground transition-all"
-                                            >
-                                                <Edit2 className="h-3 w-3" />
-                                            </button>
-                                            <button
-                                                onClick={() => deleteTask(task.id)}
-                                                className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground/40 hover:text-destructive transition-all"
-                                            >
-                                                <Trash2 className="h-3 w-3" />
-                                            </button>
+                                        </span>
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => onEditTask(task)} className="text-muted-foreground/30 hover:text-foreground"><Edit2 size={10} /></button>
+                                            <button onClick={() => deleteTask(task.id)} className="text-destructive/20 hover:text-destructive"><Trash2 size={10} /></button>
                                         </div>
                                     </div>
-                                    <h4 className="text-sm font-bold text-foreground/90 leading-relaxed mb-4">{task.content}</h4>
-                                    <div className="flex items-center justify-between pt-4 border-t border-border/5">
-                                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 font-bold uppercase tracking-tighter">
-                                            <Calendar className="h-3 w-3 opacity-40" />
-                                            {task.dueDate ? format(new Date(task.dueDate), 'MMM d') : '-'}
-                                        </div>
-                                        <div className="flex items-center gap-1.5 text-[10px] text-primary font-bold uppercase tracking-tighter">
-                                            <Timer className="h-3 w-3 opacity-40" />
-                                            {task.velocity || 0} hrs
-                                        </div>
+                                    <h4 className="text-[11px] font-bold text-foreground/80 leading-relaxed uppercase tracking-wide mb-5">{task.content}</h4>
+                                    <div className="flex items-center justify-between pt-4 border-t border-border/5 text-[8px] font-bold uppercase tracking-widest text-muted-foreground/30">
+                                        <div className="flex items-center gap-1.5"><Calendar size={10} /> {task.dueDate ? format(new Date(task.dueDate), 'MMM d') : '-'}</div>
+                                        <div className="flex items-center gap-1.5"><Timer size={10} /> {task.velocity || 0}H</div>
                                     </div>
                                 </div>
                             ))}
 
                         {data.tasks.filter(task => task.status === column.id).length === 0 && (
-                            <div className="flex-1 flex flex-col items-center justify-center p-12 border-2 border-dashed border-border/5 rounded-2xl opacity-10">
-                                <Layers className="h-12 w-12 mb-4" />
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-center">Empty Zone</p>
+                            <div className="flex-1 flex flex-col items-center justify-center p-12 border border-dashed border-border/5 rounded-2xl opacity-10">
+                                <p className="text-[8px] font-black uppercase tracking-[0.3em]">Standby</p>
                             </div>
                         )}
                     </div>
@@ -244,29 +216,29 @@ function TaskModal({ task, onSave, onClose }: {
     const [velocity, setVelocity] = useState(task.velocity || 0);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
-            <div className="glass-card-vibrant w-full max-w-md p-8 shadow-2xl animate-scale-in">
-                <h3 className="text-lg font-black tracking-tight mb-6">
-                    {task.content ? 'Edit Task' : 'New Task'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-sm animate-fade-in">
+            <div className="bg-background border border-border/10 w-full max-w-md p-10 rounded-3xl shadow-2xl animate-scale-in">
+                <h3 className="text-lg font-black tracking-tight mb-8 uppercase italic border-b border-border/5 pb-4">
+                    Initialize Protocol
                 </h3>
 
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Task Description</label>
+                        <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40 ml-1">Directive</label>
                         <input
                             autoFocus
-                            className="w-full bg-secondary/50 border border-border/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                            className="w-full bg-secondary/5 border border-border/10 rounded-xl px-4 py-4 text-[10px] font-bold uppercase tracking-widest focus:outline-none"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            placeholder="What needs to be done?"
+                            placeholder="Declare action..."
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Priority</label>
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40 ml-1">Priority</label>
                             <select
-                                className="w-full bg-secondary/50 border border-border/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none appearance-none"
+                                className="w-full bg-secondary/5 border border-border/10 rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none appearance-none"
                                 value={priority}
                                 onChange={(e) => setPriority(e.target.value as any)}
                             >
@@ -276,9 +248,9 @@ function TaskModal({ task, onSave, onClose }: {
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Status</label>
+                            <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40 ml-1">Status</label>
                             <select
-                                className="w-full bg-secondary/50 border border-border/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none appearance-none"
+                                className="w-full bg-secondary/5 border border-border/10 rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none appearance-none"
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
                             >
@@ -290,31 +262,18 @@ function TaskModal({ task, onSave, onClose }: {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Velocity (hrs)</label>
+                        <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40 ml-1">Velocity (H)</label>
                         <input
                             type="number"
-                            className="w-full bg-secondary/50 border border-border/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                            className="w-full bg-secondary/5 border border-border/10 rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none"
                             value={velocity}
                             onChange={(e) => setVelocity(parseFloat(e.target.value) || 0)}
-                            placeholder="Hours allocated"
                         />
                     </div>
 
-                    <div className="flex gap-4 pt-4">
-                        <Button
-                            variant="outline"
-                            className="flex-1"
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="primary"
-                            className="flex-1"
-                            onClick={() => onSave({ ...task, content, priority, status, velocity })}
-                        >
-                            Save Changes
-                        </Button>
+                    <div className="flex gap-4 pt-6">
+                        <Button variant="ghost" className="flex-1 h-12" onClick={onClose}>Abort</Button>
+                        <Button variant="primary" className="flex-1 h-12" onClick={() => onSave({ ...task, content, priority, status, velocity })}>Deploy</Button>
                     </div>
                 </div>
             </div>
@@ -327,63 +286,42 @@ function ExecutionAnalytics({ tasks }: { tasks: KanbanTask[] }) {
     const done = tasks.filter(t => t.status === 'done').length;
     const highPriority = tasks.filter(t => t.priority === 'High').length;
     const completionRate = total > 0 ? Math.round((done / total) * 100) : 0;
-
     const totalVelocity = tasks.reduce((acc, t) => acc + (t.velocity || 0), 0);
 
     return (
-        <div className="glass-card p-8 animate-slide-up">
-            <div className="flex items-center justify-between mb-8">
+        <div className="border border-border/10 p-10 rounded-3xl animate-slide-up bg-secondary/5">
+            <div className="flex items-center justify-between mb-12">
                 <div>
-                    <h2 className="text-sm font-black tracking-tight">Execution Analytics</h2>
-                    <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest mt-1">Real-time Performance Metrics</p>
+                    <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30 italic">Telemetry</h2>
                 </div>
-                <div className="p-4 rounded-xl bg-primary/5 text-primary shadow-glow shadow-primary/10">
-                    <BarChart3 className="h-6 w-6" />
-                </div>
+                <div className="opacity-10"><BarChart3 size={20} /></div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                <div className="space-y-10">
                     <div>
-                        <div className="flex justify-between items-end mb-3">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Overall Efficiency</span>
-                            <span className="text-xl font-black">{completionRate}%</span>
+                        <div className="flex justify-between items-end mb-4">
+                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Efficiency</span>
+                            <span className="text-xl font-black italic">{completionRate}%</span>
                         </div>
-                        <ProgressBar value={completionRate} className="h-2" />
+                        <ProgressBar value={completionRate} className="h-1" />
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-secondary/20 border border-border/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-1.5 h-8 bg-destructive rounded-full" />
-                            <div>
-                                <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Critical Paths</div>
-                                <div className="text-sm font-bold">High Priority Focus</div>
-                            </div>
+                    <div className="p-6 rounded-2xl border border-border/5 flex items-center justify-between bg-background/50">
+                        <div className="flex items-center gap-4">
+                            <div className="w-1 h-4 bg-destructive opacity-40" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Critical Path focus</span>
                         </div>
-                        <div className="text-xl font-bold">{highPriority}</div>
+                        <div className="text-lg font-black">{highPriority}</div>
                     </div>
                 </div>
 
-                <div className="md:col-span-2 grid grid-cols-1 gap-6">
-                    <AnalyticsMiniCard label="Total Velocity" value={totalVelocity.toString()} sub="Total Actual Hours" trend="+2.4" />
+                <div className="flex flex-col justify-end">
+                    <div className="bg-background/50 border border-border/5 p-8 rounded-2xl">
+                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 mb-4">Accumulated Velocity</div>
+                        <div className="text-3xl font-black tracking-tighter italic">{totalVelocity} <span className="text-[10px] uppercase tracking-widest not-italic ml-2 opacity-30">Hours</span></div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    );
-}
-
-function AnalyticsMiniCard({ label, value, sub, trend }: { label: string; value: string; sub?: string; trend: string }) {
-    const isPositive = trend.startsWith('+');
-    return (
-        <div className="p-5 rounded-2xl bg-secondary/10 border border-border/5 hover:border-primary/20 transition-all group">
-            <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/30 mb-3 group-hover:text-primary transition-colors">{label}</div>
-            <div className="text-2xl font-bold tracking-tighter mb-0.5">{value} hrs</div>
-            {sub && <div className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">{sub}</div>}
-            <div className={cn(
-                "text-[10px] font-bold mt-4 flex items-center gap-1",
-                isPositive ? "text-success" : "text-destructive"
-            )}>
-                <TrendingUp className={cn("h-3 w-3", !isPositive && "rotate-180")} /> {trend}
             </div>
         </div>
     );

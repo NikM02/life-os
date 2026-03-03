@@ -13,45 +13,40 @@ const navItems = [
   { title: 'Affirmations', url: '/', icon: Sparkles },
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Vision', url: '/vision', icon: Eye },
-  { title: 'Focus Track', url: '/goals', icon: Target },
-  { title: 'Daily Execution', url: '/execution', icon: Layers },
-  { title: 'Neural Journals', url: '/neural-journals', icon: BrainCircuit },
-  { title: 'Content Pipeline', url: '/content', icon: Clapperboard },
-  { title: 'Habits & Health', url: '/habits', icon: Heart },
-  { title: 'Finance Tracker', url: '/finance', icon: Wallet },
-  { title: 'Knowledge Library', url: '/library', icon: BookOpen },
+  { title: 'Objectives', url: '/goals', icon: Target },
+  { title: 'Task Board', url: '/execution', icon: Layers },
+  { title: 'Journals', url: '/neural-journals', icon: BrainCircuit },
+  { title: 'Pipeline', url: '/content', icon: Clapperboard },
+  { title: 'Biologicals', url: '/habits', icon: Heart },
+  { title: 'Terminal', url: '/finance', icon: Wallet },
+  { title: 'Library', url: '/library', icon: BookOpen },
 ];
 
 export function AppSidebar() {
   const navigate = useNavigate();
 
   return (
-    <Sidebar className="border-r border-border bg-sidebar-background transition-all duration-300">
-      <div className="p-6 pb-4">
-        <Link to="/dashboard" className="flex items-center gap-4 mb-2 group">
-          <h1 className="text-xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col uppercase">
+    <Sidebar className="border-r border-border/10 bg-sidebar-background transition-all duration-300">
+      <div className="p-8 pb-10">
+        <Link to="/dashboard" className="flex items-center gap-4 group">
+          <h1 className="text-lg font-black tracking-tighter text-foreground group-hover:opacity-60 transition-opacity flex flex-col uppercase italic">
             NOS
           </h1>
         </Link>
       </div>
-      <SidebarContent className="px-4">
+      <SidebarContent className="px-6">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/30 px-4 mb-2">
-            System
+          <SidebarGroupLabel className="text-[8px] font-bold uppercase tracking-[0.4em] text-muted-foreground/20 px-2 mb-6">
+            Core Modules
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {navItems.map(item => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === '/'}
-                      className="flex items-center gap-3 px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 hover:text-foreground hover:bg-secondary/30 transition-all group"
-                      activeClassName="bg-primary/5 text-primary shadow-none"
-                    >
-                      <item.icon className="h-3.5 w-3.5 transition-transform group-hover:scale-105" />
-                      <span>{item.title}</span>
+            <SidebarMenu className="gap-2">
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="hover:bg-transparent px-2">
+                    <NavLink to={item.url} className="flex items-center gap-3 w-full group py-1.5 opacity-40 hover:opacity-100 transition-all">
+                      <item.icon size={16} className="group-[.active]:text-primary" strokeWidth={2.5} />
+                      <span className="text-[10px] font-black uppercase tracking-widest leading-none group-[.active]:text-primary">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -60,7 +55,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
     </Sidebar>
   );
 }
