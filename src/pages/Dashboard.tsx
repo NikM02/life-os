@@ -8,7 +8,7 @@ import { useData } from '@/contexts/DataContext';
 import { formatCurrency } from '@/lib/finance-utils';
 import { format } from 'date-fns';
 import useEmblaCarousel from 'embla-carousel-react';
-import { CategoryBadge } from '@/components/shared';
+import { CategoryBadge, StatCard } from '@/components/shared';
 
 export default function Dashboard() {
   const { vision, goals, execution, transactions, health, reflections } = useData();
@@ -36,118 +36,122 @@ export default function Dashboard() {
   const [executionEmblaRef] = useEmblaCarousel({ align: 'start', loop: false });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-24 pb-32 animate-fade-in px-4 pt-16 shadow-none">
-      <section className="border-b border-border/5 pb-16">
+    <div className="max-w-6xl mx-auto space-y-20 pb-32 animate-fade-in px-4 pt-16 shadow-none">
+      <section className="space-y-6">
         <Link to="/vision" className="group block space-y-4">
-          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/20 italic block">CORE DIRECTIVE</span>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground italic leading-tight transition-all group-hover:opacity-40">
-            {vision?.oneYearVision || "ESTABLISH TRAJECTORY. DEFINE PARAMETERS."}
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/30 block">Current Directive</span>
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground/90 leading-tight transition-all">
+            {vision?.oneYearVision || "Design your existence. Define your trajectory."}
           </h1>
         </Link>
       </section>
 
-      <section className="space-y-8">
-        <div className="flex items-center justify-between opacity-30">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] italic">Biologicals</h2>
-          <Link to="/habits" className="text-[8px] font-black uppercase tracking-widest hover:text-foreground">Uplink</Link>
+      <section className="space-y-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground/80">Biological State</h2>
+          <Link to="/habits" className="text-xs font-semibold text-muted-foreground/40 hover:text-primary transition-colors">Details</Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {[
-            { label: 'Sleep', value: `${todayHealth.sleep}H`, icon: Moon },
+            { label: 'Sleep', value: `${todayHealth.sleep}h`, icon: Moon },
             { label: 'Water', value: `${todayHealth.water}L`, icon: Droplets },
-            { label: 'Activity', value: todayHealth.workout || 'Standby', icon: Flame },
+            { label: 'Activity', value: todayHealth.workout || 'Nominal', icon: Flame },
             { label: 'Neuro', value: `${todayHealth.mood}/10`, icon: Smile },
-            { label: 'Sync', value: todayReflection ? 'Active' : 'Void', icon: BrainCircuit }
+            { label: 'Journal', value: todayReflection ? 'Captured' : 'Pending', icon: BrainCircuit }
           ].map((item, i) => (
-            <div key={i} className="flex flex-col gap-2 p-6 border border-border/10 rounded-2xl group hover:bg-secondary/5 transition-all">
-              <div className="flex items-center gap-3 opacity-20">
-                <item.icon size={12} />
-                <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
+            <div key={i} className="flex flex-col gap-3 p-6 bg-secondary/20 rounded-3xl border border-border/5 group hover:border-primary/20 transition-all duration-500">
+              <div className="flex items-center gap-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                <item.icon size={14} />
+                <span className="text-[10px] font-semibold uppercase tracking-wider">{item.label}</span>
               </div>
-              <span className="text-sm font-black italic uppercase tracking-tight">{item.value}</span>
+              <span className="text-lg font-semibold tracking-tight text-foreground/90">{item.value}</span>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="space-y-8">
-        <div className="flex items-center justify-between opacity-30">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] italic">Capitals</h2>
-          <Link to="/finance" className="text-[8px] font-black uppercase tracking-widest hover:text-foreground">Terminal</Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 p-10 border border-border/10 rounded-3xl bg-secondary/5">
-          <div className="space-y-2">
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 italic">Equity</span>
-            <div className="text-3xl font-black italic tracking-tighter">{formatCurrency(balance)}</div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+        <section className="space-y-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground/80">Capital Assets</h2>
+            <Link to="/finance" className="text-xs font-semibold text-muted-foreground/40 hover:text-primary transition-colors">Terminal</Link>
           </div>
-          <div className="space-y-2 opacity-60">
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 italic">Inflow</span>
-            <div className="text-xl font-black italic tracking-tighter text-success">{formatCurrency(totalIncome)}</div>
-          </div>
-          <div className="space-y-2 opacity-60">
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 italic">Outflow</span>
-            <div className="text-xl font-black italic tracking-tighter text-destructive">{formatCurrency(totalExpenses)}</div>
-          </div>
-        </div>
-      </section>
-
-      <section className="space-y-8">
-        <div className="flex items-center justify-between opacity-30">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] italic">Objectives</h2>
-          <Link to="/goals" className="text-[8px] font-black uppercase tracking-widest hover:text-foreground">Manifest</Link>
-        </div>
-        <div className="embla overflow-hidden" ref={missionsEmblaRef}>
-          <div className="embla__container flex gap-8">
-            {(!goals || goals.filter(g => g.status !== 'Completed').length === 0) ? (
-              <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/10 p-16 rounded-3xl text-center opacity-20 italic">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">No active objectives</span>
+          <div className="p-10 rounded-3xl bg-secondary/20 border border-border/5 space-y-8">
+            <div className="space-y-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/30">Available Equity</span>
+              <div className="text-4xl font-semibold tracking-tight">{formatCurrency(balance)}</div>
+            </div>
+            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-border/5">
+              <div className="space-y-1">
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/30">Inflow</span>
+                <div className="text-xl font-semibold text-success/80">{formatCurrency(totalIncome)}</div>
               </div>
-            ) : (
-              goals.filter(g => g.status !== 'Completed').map(goal => (
-                <div key={goal.id} className="embla__slide flex-[0_0_80%] md:flex-[0_0_30%]">
-                  <div className="border border-border/10 p-8 rounded-3xl h-full flex flex-col justify-between hover:bg-secondary/5 transition-all group">
-                    <div>
-                      <div className="flex justify-between items-center mb-6">
-                        <CategoryBadge category={goal.category} className="opacity-40" />
-                        <span className="text-[7px] font-black uppercase tracking-widest opacity-20">{goal.timeframe}</span>
+              <div className="space-y-1">
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/30">Outflow</span>
+                <div className="text-xl font-semibold text-destructive/80">{formatCurrency(totalExpenses)}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground/80">Active Objectives</h2>
+            <Link to="/goals" className="text-xs font-semibold text-muted-foreground/40 hover:text-primary transition-colors">Manifest</Link>
+          </div>
+          <div className="embla overflow-hidden" ref={missionsEmblaRef}>
+            <div className="embla__container flex gap-6">
+              {(!goals || goals.filter(g => g.status !== 'Completed').length === 0) ? (
+                <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/10 p-12 rounded-3xl text-center opacity-20">
+                  <span className="text-xs font-medium italic">No active objectives</span>
+                </div>
+              ) : (
+                goals.filter(g => g.status !== 'Completed').map(goal => (
+                  <div key={goal.id} className="embla__slide flex-[0_0_90%]">
+                    <div className="bg-background border border-border/10 p-8 rounded-3xl h-full flex flex-col justify-between hover:border-primary/20 transition-all group">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <CategoryBadge category={goal.category} className="opacity-40" />
+                          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/20">{goal.timeframe}</span>
+                        </div>
+                        <h3 className="text-lg font-semibold tracking-tight leading-tight group-hover:text-primary transition-colors">{goal.title}</h3>
                       </div>
-                      <h3 className="text-base font-black italic uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">{goal.title}</h3>
-                    </div>
-                    <div className="mt-8 pt-6 border-t border-border/5 flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
-                      <span className="opacity-20 italic">Yield</span>
-                      <span className="text-primary italic">{goal.progress}%</span>
+                      <div className="mt-8 pt-6 border-t border-border/5 flex items-center justify-between">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/20">Progress</span>
+                        <span className="text-xs font-bold text-primary">{goal.progress}%</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <section className="space-y-8">
-        <div className="flex items-center justify-between opacity-30">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] italic">Execution</h2>
-          <Link to="/execution" className="text-[8px] font-black uppercase tracking-widest hover:text-foreground">Registry</Link>
+      <section className="space-y-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground/80">Execution Registry</h2>
+          <Link to="/execution" className="text-xs font-semibold text-muted-foreground/40 hover:text-primary transition-colors">Registry</Link>
         </div>
         <div className="embla overflow-hidden" ref={executionEmblaRef}>
-          <div className="embla__container flex gap-8">
+          <div className="embla__container flex gap-6">
             {(!execution || !execution.tasks || execution.tasks.filter(e => e.status !== 'Done').length === 0) ? (
-              <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/10 p-16 rounded-3xl text-center opacity-20 italic">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Runtime optimal</span>
+              <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/10 p-12 rounded-3xl text-center opacity-20">
+                <span className="text-xs font-medium italic">System optimized</span>
               </div>
             ) : (
               execution.tasks.filter(e => e.status !== 'Done').map(item => (
-                <div key={item.id} className="embla__slide flex-[0_0_80%] md:flex-[0_0_35%]">
-                  <div className="border border-border/10 p-8 rounded-3xl h-full hover:bg-secondary/5 transition-all group">
-                    <div className="flex items-center justify-between mb-6">
+                <div key={item.id} className="embla__slide flex-[0_0_80%] md:flex-[0_0_30%]">
+                  <div className="bg-secondary/10 border border-border/10 p-8 rounded-3xl h-full hover:border-primary/40 transition-all group">
+                    <div className="flex justify-between items-start mb-6">
                       <span className={cn(
-                        "text-[7px] font-black uppercase tracking-widest opacity-30",
-                        item.priority === 'High' && "text-destructive opacity-100"
-                      )}>{item.priority}</span>
-                      <span className="text-[7px] font-black uppercase tracking-widest opacity-20 italic">{item.dueDate || 'ASAP'}</span>
+                        "text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-lg border",
+                        item.priority === 'High' ? "border-destructive/30 text-destructive/60" : "border-border/30 text-muted-foreground/30"
+                      )}>{item.priority} Priority</span>
+                      <span className="text-[9px] font-medium text-muted-foreground/20 italic">{item.dueDate || 'ASAP'}</span>
                     </div>
-                    <h3 className="text-sm font-black italic uppercase italic tracking-tight group-hover:opacity-40 transition-all">{item.content}</h3>
+                    <h3 className="text-sm font-semibold tracking-normal text-foreground/80 group-hover:text-primary transition-colors">{item.content}</h3>
                   </div>
                 </div>
               ))

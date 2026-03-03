@@ -1,129 +1,135 @@
-import React, { useState } from 'react';
-import { useData } from '@/contexts/DataContext';
-import { PageHeader, Button } from '@/components/shared';
+import React, { useState, useMemo } from 'react';
 import {
-    Save, Trash2, Edit2, ChevronLeft, ChevronRight,
-    Sparkles, Calendar, CheckCircle2, History, Download
+    BrainCircuit, Calendar, ChevronLeft, ChevronRight,
+    Star, Smile, Edit2, Save, Trash2, Clock, Search,
+    Filter, Send, BookOpen
 } from 'lucide-react';
-import { format, addDays, subDays, isSameDay } from 'date-fns';
+import { PageHeader, StatCard, Button } from '@/components/shared';
+import { useData } from '@/contexts/DataContext';
+import { format, subDays, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Textarea } from '@/components/ui/textarea';
-import { exportReflectionsDataToCSV } from '@/lib/export-utils';
+import { DailyReflection } from '@/types/lifeos';
 
-export default function DailyReflectionsPage() {
+export default function DailyReflections() {
     const { reflections, setReflections } = useData();
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [isEditing, setIsEditing] = useState(false);
-    const [draft, setDraft] = useState('');
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [entry, setEntry] = useState('');
+    const [mood, setMood] = useState(5);
 
-    const dateStr = format(currentDate, 'yyyy-MM-dd');
-    const activeReflection = reflections.find(r => r.date === dateStr);
-    const isToday = isSameDay(currentDate, new Date());
+    const todayEntry = useMemo(() => {
+        return reflections.find(r => isSameDay(new Date(r.date), selectedDate));
+    }, [reflections, selectedDate]);
+
+    const stats = useMemo(() => {
+        const total = reflections.length;
+        const avgMood = total > 0 ? (reflections.reduce((sum, r) => sum + r.mood, 0) / total).toFixed(1) : 0;
+        const currentStreak = 0; // Simplified for now
+        return { total, avgMood, currentStreak };
+    }, [reflections]);
 
     const handleSave = () => {
-        const id = activeReflection?.id || crypto.randomUUID();
-        const newReflection = { id, date: dateStr, text: draft };
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        const existingIndex = reflections.findIndex(r => r.date === dateStr);
 
-        if (activeReflection) {
-            setReflections(reflections.map(r => r.id === id ? newReflection : r));
+        const newReflection = {
+            id: todayEntry?.id || Math.random().toString(36).substr(2, 9),
+            date: dateStr,
+            content: entry,
+            mood,
+            createdAt: todayEntry?.createdAt || new Date().toISOString()
+        };
+
+        if (existingIndex >= 0) {
+            setReflections(reflections.map((r, i) => i === existingIndex ? newReflection : r));
         } else {
-            setReflections([...reflections, newReflection]);
+            setReflections([newReflection, ...reflections]);
         }
-        setIsEditing(false);
-    };
-
-    const startEditing = () => {
-        setDraft(activeReflection?.text || '');
-        setIsEditing(true);
-    };
-
-    const deleteReflection = (id: string) => {
-        setReflections(reflections.filter(r => r.id !== id));
-        setIsEditing(false);
     };
 
     return (
-        <div className="max-w-4xl mx-auto pb-32 px-4 animate-fade-in shadow-none">
-            <PageHeader title="Journals" description="Archive consciousness and synthesize cognitive patterns.">
-                <div className="flex items-center gap-3">
-                    <Button variant="ghost" size="sm" onClick={() => exportReflectionsDataToCSV(reflections)} className="opacity-40 hover:opacity-100">
-                        <Download size={14} className="mr-2" /> Export
-                    </Button>
-                    <div className="flex items-center gap-4 bg-secondary/5 px-3 py-1.5 rounded-xl border border-border/10">
-                        <button onClick={() => setCurrentDate(prev => subDays(prev, 1))} className="opacity-30 hover:opacity-100 transition-opacity"><ChevronLeft size={14} /></button>
-                        <div className="flex flex-col items-center min-w-[120px]">
-                            <span className="text-[10px] font-black uppercase tracking-tighter italic">{format(currentDate, 'MMMM d, yyyy')}</span>
+        <div className="max-w-5xl mx-auto pb-32 px-4 animate-fade-in shadow-none">
+            <PageHeader
+                title="Journals"
+                description="The neural observatory. Synthesize consciousness and deconstruct temporal experience."
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <StatCard label="Life Logs" value={stats.total} icon={<BookOpen />} />
+                <StatCard label="Clarity Index" value={stats.avgMood} icon={<Smile />} />
+                <StatCard label="Rhythm Streak" value={`${stats.currentStreak}d`} icon={<BrainCircuit />} />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                <div className="lg:col-span-8 space-y-12">
+                    <div className="p-10 rounded-3xl bg-secondary/10 border border-border/5 space-y-10 group">
+                        <div className="flex items-center justify-between border-b border-border/10 pb-8 transition-colors group-hover:border-primary/20">
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/30">Temporal Key</span>
+                                <h3 className="text-xl font-semibold tracking-tight">{format(selectedDate, 'MMMM d, yyyy')}</h3>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => setSelectedDate(subDays(selectedDate, 1))} className="p-2.5 rounded-xl border border-border/40 hover:border-primary/40 hover:text-primary transition-all"><ChevronLeft size={16} /></button>
+                                <button onClick={() => setSelectedDate(new Date())} className="text-[10px] font-semibold uppercase tracking-widest px-4 py-2 border border-border/40 rounded-xl hover:border-primary/40 hover:text-primary transition-all">Present</button>
+                                <button onClick={() => setSelectedDate(subDays(selectedDate, -1))} className="p-2.5 rounded-xl border border-border/40 hover:border-primary/40 hover:text-primary transition-all"><ChevronRight size={16} /></button>
+                            </div>
                         </div>
-                        <button onClick={() => setCurrentDate(prev => addDays(prev, 1))} disabled={isToday} className="disabled:opacity-5 opacity-30 hover:opacity-100 transition-opacity"><ChevronRight size={14} /></button>
+
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/30 ml-1">Synthesis</label>
+                            <textarea
+                                className="w-full bg-transparent border-none text-lg font-semibold tracking-tight text-foreground/80 leading-relaxed focus:outline-none min-h-[300px] resize-none placeholder:text-muted-foreground/10"
+                                placeholder="Architect your thoughts... What was salvaged? What was deconstructed?"
+                                value={entry || todayEntry?.content || ''}
+                                onChange={(e) => setEntry(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between pt-10 border-t border-border/10">
+                            <div className="flex items-center gap-8">
+                                <div className="space-y-2">
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/30">Mood Balance</span>
+                                    <div className="flex items-center gap-3">
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(m => (
+                                            <button
+                                                key={m}
+                                                onClick={() => setMood(m)}
+                                                className={cn(
+                                                    "w-6 h-6 rounded-full text-[9px] font-bold transition-all",
+                                                    (mood === m || todayEntry?.mood === m) ? "bg-primary text-primary-foreground scale-110" : "bg-secondary text-muted-foreground/40 hover:bg-primary/20 hover:text-primary"
+                                                )}
+                                            >
+                                                {m}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <Button onClick={handleSave} className="px-8 rounded-2xl group">
+                                <Save size={14} className="mr-3 transition-transform group-hover:scale-110" /> Sync Fragment
+                            </Button>
+                        </div>
                     </div>
                 </div>
-            </PageHeader>
 
-            <div className="mt-20">
-                {!isEditing && !activeReflection ? (
-                    <div className="border border-dashed border-border/10 rounded-3xl py-32 text-center opacity-40 hover:opacity-100 transition-all duration-700">
-                        <div className="space-y-8">
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] italic">Temporal Void</h2>
-                            <Button variant="outline" onClick={startEditing} className="h-10 px-8 rounded-xl border-border/10 text-[9px]">
-                                INIT LOGGING
-                            </Button>
-                        </div>
-                    </div>
-                ) : isEditing ? (
-                    <div className="space-y-12 animate-slide-up">
-                        <div className="flex items-center justify-between opacity-30">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] italic">Active Uplink</h3>
-                            <button onClick={() => setIsEditing(false)} className="text-[8px] font-black uppercase tracking-widest hover:text-foreground">Abort</button>
-                        </div>
-
-                        <Textarea
-                            value={draft}
-                            onChange={e => setDraft(e.target.value)}
-                            placeholder="Synthesize reality..."
-                            className="min-h-[500px] bg-transparent border-none text-2xl font-black italic tracking-tight leading-relaxed resize-none focus-visible:ring-0 p-0 placeholder:text-muted-foreground/5 shadow-none"
-                            autoFocus
-                        />
-
-                        <div className="pt-12 border-t border-border/5">
-                            <Button variant="primary" className="w-full h-14 rounded-2xl" onClick={handleSave}>
-                                <Save size={16} className="mr-3" /> Commit to Archive
-                            </Button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-16 animate-slide-up">
-                        <div className="flex items-center justify-between group">
-                            <div className="flex items-center gap-4 opacity-30">
-                                <History size={14} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">Persisted entry</span>
-                            </div>
-                            <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-all">
-                                <button onClick={startEditing} className="text-muted-foreground/30 hover:text-foreground transition-all"><Edit2 size={12} /></button>
-                                <button onClick={() => deleteReflection(activeReflection.id)} className="text-destructive/20 hover:text-destructive transition-all"><Trash2 size={12} /></button>
-                            </div>
-                        </div>
-
-                        <div className="relative">
-                            <p className="text-2xl font-black italic tracking-tight leading-relaxed opacity-80 whitespace-pre-wrap">
-                                {activeReflection.text}
-                            </p>
-                        </div>
-
-                        <div className="pt-12 border-t border-border/5 flex items-center justify-between opacity-30">
-                            <div className="flex gap-8">
-                                <div className="space-y-2">
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Integrity</span>
-                                    <div className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">High Fidelity</div>
+                <div className="lg:col-span-4 space-y-12">
+                    <div className="space-y-6">
+                        <h3 className="text-lg font-semibold tracking-tight opacity-40">Archive</h3>
+                        <div className="space-y-6">
+                            {reflections.slice(0, 5).map(r => (
+                                <div key={r.id} className="group cursor-pointer space-y-2" onClick={() => setSelectedDate(new Date(r.date))}>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-muted-foreground/30 uppercase tracking-widest">{format(new Date(r.date), 'MMM d')}</span>
+                                        <span className="text-[10px] font-bold text-primary group-hover:underline transition-all opacity-40 group-hover:opacity-100">Review</span>
+                                    </div>
+                                    <p className="text-xs font-medium text-foreground/60 leading-relaxed line-clamp-2 italic">
+                                        {r.content}
+                                    </p>
                                 </div>
-                                <div className="space-y-2">
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Coordinates</span>
-                                    <div className="text-[9px] font-black uppercase tracking-[0.2em]">{activeReflection.id.substring(0, 8)}</div>
-                                </div>
-                            </div>
-                            <Sparkles size={14} />
+                            ))}
                         </div>
+                        <Button variant="ghost" className="w-full text-[10px] opacity-30 hover:opacity-100 italic">Access Full Archive</Button>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

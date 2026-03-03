@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { DataProvider } from "@/contexts/DataContext";
 import Dashboard from "./pages/Dashboard";
-import Affirmations from "./pages/Affirmations";
 import Vision from "./pages/Vision";
 import Goals from "./pages/Goals";
 import Habits from "./pages/Habits";
@@ -40,7 +39,7 @@ const AppContent = () => {
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<Affirmations />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vision" element={<Vision />} />
           <Route path="/goals" element={<Goals />} />

@@ -1,116 +1,80 @@
-import { useState } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { VisionData } from '@/types/lifeos';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { PageHeader, Button } from '@/components/shared';
-import { Target, Compass, Sparkles, Layout, Save, Heart, Briefcase, GraduationCap, Coins, Users, Zap, Smile } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
 import { useData } from '@/contexts/DataContext';
+import { PageHeader } from '@/components/shared';
+import { cn } from '@/lib/utils';
+import { Target, Compass, Sparkles, Anchor } from 'lucide-react';
 
 export default function Vision() {
-  const { vision, setVision } = useData();
+  const { vision } = useData();
 
-  const updateVision = (field: string, value: any) => {
-    setVision({ ...vision, [field]: value });
-  };
-
-  const updateCore = (field: string, value: string) => {
-    setVision({ ...vision, coreSections: { ...vision.coreSections, [field]: value } });
-  };
-
-  const addPrinciple = (p: string) => {
-    if (!p.trim()) return;
-    setVision({ ...vision, principles: [...vision.principles, p] });
-  };
+  const sections = [
+    {
+      id: 'directives',
+      title: 'Current Directive',
+      content: vision?.oneYearVision || "Design your existence. Define your trajectory.",
+      icon: Compass,
+      description: 'The primary azimuth for the current temporal cycle.'
+    },
+    {
+      id: 'intentions',
+      title: 'Core Intentions',
+      content: vision?.fiveYearVision || "Establishing a legacy of conscious orchestration and biological optimization.",
+      icon: Target,
+      description: 'Long-horizon strategic alignment.'
+    },
+    {
+      id: 'principles',
+      title: 'Fundamental Principles',
+      content: vision?.lifePurpose || "To synthesize reality through the lens of clarity, discipline, and aesthetic excellence.",
+      icon: Sparkles,
+      description: 'The bedrock of all operational decisions.'
+    }
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto pb-32 px-4 animate-fade-in">
-      <PageHeader title="Directives" description="Define the core logic of your existence." />
+    <div className="max-w-6xl mx-auto pb-32 px-4 animate-fade-in shadow-none">
+      <PageHeader
+        title="Vision"
+        description="The architectural blueprint of your future self. Orchestrate your reality with precision."
+      />
 
-      <Tabs defaultValue="philosophy" className="space-y-12">
-        <TabsList className="bg-transparent p-0 h-auto border-b border-border/5 w-full justify-start gap-8 rounded-none pb-4">
-          {['philosophy', 'horizon', 'domains'].map((tab) => (
-            <TabsTrigger
-              key={tab}
-              value={tab}
-              className="bg-transparent border-none p-0 h-auto text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 data-[state=active]:text-primary data-[state=active]:shadow-none transition-all"
-            >
-              {tab}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <div className="mt-24 space-y-40">
+        {sections.map((section, index) => (
+          <section key={section.id} className={cn(
+            "flex flex-col md:flex-row gap-12 items-start",
+            index % 2 === 1 ? "md:flex-row-reverse" : ""
+          )}>
+            <div className="w-full md:w-1/3 space-y-4 pt-4">
+              <div className="flex items-center gap-4 text-primary/20">
+                <section.icon size={24} strokeWidth={1} />
+                <div className="h-px flex-1 bg-border/40" />
+              </div>
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground/80">{section.title}</h2>
+              <p className="text-sm font-medium text-muted-foreground/40 leading-relaxed italic">
+                {section.description}
+              </p>
+            </div>
 
-        <TabsContent value="philosophy" className="space-y-16 animate-slide-up outline-none">
-          <div className="space-y-12">
-            <div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/20 mb-8 flex items-center gap-3">
-                <Compass size={12} /> Principles
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vision.principles.map((p, i) => (
-                  <div key={i} className="p-4 border border-border/10 rounded-xl bg-secondary/5 text-[11px] font-medium leading-relaxed uppercase tracking-wider">
-                    {p}
-                  </div>
-                ))}
-                <Input
-                  className="bg-transparent border-dashed border-border/20 h-14 rounded-xl px-4 text-[10px] font-bold uppercase tracking-widest placeholder:text-muted-foreground/20 focus-visible:ring-0"
-                  placeholder="Insert principle..."
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      addPrinciple(e.currentTarget.value);
-                      e.currentTarget.value = '';
-                    }
-                  }}
-                />
+            <div className="w-full md:w-2/3 p-12 rounded-3xl bg-secondary/20 border border-border/10 group hover:border-primary/20 transition-all duration-700">
+              <div className="relative">
+                <span className="absolute -top-6 -left-6 text-6xl text-primary/5 font-serif select-none pointer-events-none">"</span>
+                <p className="text-3xl font-semibold tracking-tight text-foreground leading-relaxed group-hover:text-primary transition-colors">
+                  {section.content}
+                </p>
               </div>
             </div>
-          </div>
-        </TabsContent>
+          </section>
+        ))}
+      </div>
 
-        <TabsContent value="horizon" className="space-y-16 animate-slide-up outline-none">
-          <div className="grid grid-cols-1 gap-12">
-            {[
-              { label: 'Long Range Vision (3Y)', value: vision.threeYearVision, field: 'threeYearVision' },
-              { label: 'Immediate Directive (1Y)', value: vision.oneYearVision, field: 'oneYearVision' }
-            ].map((v, i) => (
-              <div key={i} className="space-y-6">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/20 italic">{v.label}</h3>
-                <Textarea
-                  value={v.value}
-                  onChange={e => updateVision(v.field, e.target.value)}
-                  className="bg-transparent border-none text-xl md:text-2xl font-black tracking-tight leading-tight p-0 h-32 focus-visible:ring-0 placeholder:text-muted-foreground/10"
-                  placeholder="Define trajectory..."
-                />
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="domains" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-up outline-none">
-          {[
-            { id: 'health', icon: Heart, label: 'Biologicals' },
-            { id: 'financial', icon: Coins, label: 'Capital' },
-            { id: 'career', icon: Briefcase, label: 'Output' },
-            { id: 'personalGrowth', icon: GraduationCap, label: 'Internal' },
-            { id: 'socialImpact', icon: Users, label: 'External' },
-            { id: 'joyExperience', icon: Smile, label: 'States' }
-          ].map((domain) => (
-            <div key={domain.id} className="space-y-4">
-              <div className="flex items-center gap-3 opacity-20">
-                <domain.icon size={14} />
-                <span className="text-[9px] font-black uppercase tracking-[0.3em]">{domain.label}</span>
-              </div>
-              <Textarea
-                className="bg-secondary/5 border-border/10 rounded-2xl p-4 text-[10px] uppercase font-bold tracking-widest leading-relaxed h-32 focus-visible:ring-0 placeholder:text-muted-foreground/10"
-                placeholder="Declare..."
-                value={(vision.coreSections as any)[domain.id]}
-                onChange={e => updateCore(domain.id, e.target.value)}
-              />
-            </div>
-          ))}
-        </TabsContent>
-      </Tabs>
+      <div className="mt-40 pt-20 border-t border-border/10 text-center space-y-6">
+        <div className="inline-flex items-center gap-4 text-primary/10">
+          <Anchor size={32} strokeWidth={0.5} />
+        </div>
+        <p className="text-xl font-medium text-muted-foreground/30 italic max-w-2xl mx-auto">
+          "Existence is not a set of circumstances, but a series of choices aligned with a singular vision."
+        </p>
+      </div>
     </div>
   );
 }
