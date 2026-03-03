@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/shared';
 import { Input } from '@/components/ui/input';
-import { ShieldCheck, Lock, Mail, Loader2 } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, Loader2, Chrome } from 'lucide-react';
 
 export default function SupabaseAuth() {
     const [loading, setLoading] = useState(false);
@@ -34,6 +34,23 @@ export default function SupabaseAuth() {
                     if (error) throw error;
                 }
             }
+        } catch (error: any) {
+            alert(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleAuth = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+            if (error) throw error;
         } catch (error: any) {
             alert(error.message);
         } finally {
@@ -99,6 +116,25 @@ export default function SupabaseAuth() {
                             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (isSignUp ? 'Initialize Profile' : 'Gain Access')}
                         </Button>
                     </form>
+
+                    <div className="relative py-4">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-primary/5"></span>
+                        </div>
+                        <div className="relative flex justify-center text-[8px] uppercase font-black tracking-[0.3em]">
+                            <span className="bg-background px-4 text-muted-foreground/30">Or Connect via Cloud</span>
+                        </div>
+                    </div>
+
+                    <Button
+                        onClick={handleGoogleAuth}
+                        variant="secondary"
+                        className="w-full h-14 rounded-xl text-xs font-black uppercase tracking-widest bg-secondary/20 hover:bg-secondary/40 border-none group"
+                        disabled={loading}
+                    >
+                        <Chrome className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
+                        Sync with Google
+                    </Button>
 
                     <div className="pt-4">
                         <button
