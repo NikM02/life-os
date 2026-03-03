@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useRef } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { supabase } from '@/lib/supabase';
 import {
@@ -176,20 +176,34 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         pullFromCloud();
     }, [user]);
 
+    const syncTimers = useRef<{ [key: string]: NodeJS.Timeout }>({});
+
+    const debouncedSync = (table: string, data: any, isArray: boolean = true) => {
+        if (!user || !isInitialLoadDone) return;
+
+        if (syncTimers.current[table]) {
+            clearTimeout(syncTimers.current[table]);
+        }
+
+        syncTimers.current[table] = setTimeout(() => {
+            sync(table, data, isArray);
+        }, 2000); // 2 second debounce
+    };
+
     // Automated Synchronization Hooks
-    React.useEffect(() => { if (isInitialLoadDone) sync('vision', vision, false); }, [vision]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('goals', goals, true); }, [goals]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('execution', execution, false); }, [execution]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('transactions', transactions, true); }, [transactions]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('investments', investments, true); }, [investments]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('budgets', budgets, true); }, [budgets]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('content', content, false); }, [content]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('library', library, true); }, [library]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('habits', habits, true); }, [habits]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('health', health, true); }, [health]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('blocks', blocks, true); }, [blocks]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('reviews', reviews, true); }, [reviews]);
-    React.useEffect(() => { if (isInitialLoadDone) sync('reflections', reflections, true); }, [reflections]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('vision', vision, false); }, [vision]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('goals', goals, true); }, [goals]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('execution', execution, false); }, [execution]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('transactions', transactions, true); }, [transactions]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('investments', investments, true); }, [investments]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('budgets', budgets, true); }, [budgets]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('content', content, false); }, [content]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('library', library, true); }, [library]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('habits', habits, true); }, [habits]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('health', health, true); }, [health]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('blocks', blocks, true); }, [blocks]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('reviews', reviews, true); }, [reviews]);
+    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('reflections', reflections, true); }, [reflections]);
 
     // Sync helpers (generic upsert)
     const sync = async (table: string, data: any, isArray: boolean = true) => {

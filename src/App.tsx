@@ -15,6 +15,7 @@ import Finance from "./pages/Finance";
 import Execution from "./pages/Execution";
 import ContentPipeline from "./pages/ContentPipeline";
 import DailyReflections from "./pages/DailyReflections";
+import Logout from "./pages/Logout";
 import NotFound from "./pages/NotFound";
 
 import { useState, useEffect } from "react";
@@ -79,6 +80,7 @@ const AppContent = () => {
           <Route path="/finance" element={<Finance />} />
           <Route path="/library" element={<Library />} />
           <Route path="/neural-journals" element={<DailyReflections />} />
+          <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

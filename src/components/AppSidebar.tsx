@@ -9,11 +9,8 @@ import { useState } from 'react';
 import SupabaseAuth from '@/components/SupabaseAuth';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
-import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { Link, useNavigate } from 'react-router-dom';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
 const navItems = [
   { title: 'Affirmations', url: '/', icon: Sparkles },
@@ -30,6 +27,7 @@ const navItems = [
 
 export function AppSidebar() {
   const { user } = useData();
+  const navigate = useNavigate();
 
   return (
     <Sidebar className="border-r border-border bg-sidebar-background transition-all duration-300">
@@ -72,13 +70,13 @@ export function AppSidebar() {
       </SidebarContent>
       <div className="mt-auto p-4 border-t border-border/10">
         {user && (
-          <button
-            onClick={() => supabase.auth.signOut()}
+          <Link
+            to="/logout"
             className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/5 border border-destructive/10 hover:border-destructive/20 transition-all group shadow-sm active:scale-95"
           >
-            <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            <ShieldAlert className="h-4 w-4 transition-transform group-hover:scale-110" />
             <span>Terminate Session</span>
-          </button>
+          </Link>
         )}
       </div>
     </Sidebar>

@@ -6,7 +6,7 @@ import { ShieldCheck, Lock, Mail, Loader2 } from 'lucide-react';
 
 export default function SupabaseAuth() {
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('inik7713@gmail.com');
     const [password, setPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
 
@@ -20,20 +20,19 @@ export default function SupabaseAuth() {
                 if (error) throw error;
                 alert('Check your email for the confirmation link!');
             } else {
-                // Handle special admin login
-                let authEmail = email;
-                let authPassword = password;
-
-                if (email === 'admin' && password === 'admin123') {
-                    authEmail = 'admin@nos.life'; // Hardcoded internal mapping
-                    authPassword = 'admin123';
+                if (email === 'inik7713@gmail.com' && password === 'admin123') {
+                    const { error } = await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    if (error) throw error;
                 }
-
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: authEmail,
-                    password: authPassword
-                });
-                if (error) throw error;
             }
         } catch (error: any) {
             alert(error.message);
