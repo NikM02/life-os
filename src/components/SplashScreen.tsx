@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Lock, ChevronRight, Sparkles } from 'lucide-react';
+import { Book, Lock, ChevronRight, Sparkles, Key } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SplashScreenProps {
@@ -52,72 +52,96 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onSuccess }) => {
   }, [pin, onSuccess]);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black select-none overflow-hidden">
-      {/* Background Micro-animations */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] animate-pulse delay-700" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] select-none overflow-hidden font-serif">
+      {/* Premium Background Grain & Depth */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]" />
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/5 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
       <div className={cn(
         "flex flex-col items-center transition-all duration-1000 ease-in-out relative z-10",
-        loading ? "scale-110 opacity-0 blur-2xl" : "scale-100 opacity-100 animate-in fade-in zoom-in duration-700"
+        loading ? "scale-110 opacity-0 blur-2xl" : "scale-100 opacity-100 animate-in fade-in zoom-in duration-1000"
       )}>
-        <div className="mb-12 flex flex-col items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center animate-bounce shadow-2xl shadow-white/5">
-            <Shield className="h-6 w-6 text-white" />
+        <div className="mb-16 flex flex-col items-center gap-6">
+          <div className="h-16 w-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl relative group overflow-hidden transition-all duration-700 hover:border-white/20">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Book className="h-7 w-7 text-white/80 group-hover:text-white transition-colors" strokeWidth={1.5} />
           </div>
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-xl font-black tracking-[0.4em] text-white uppercase italic">N-OS</h1>
-            <span className="text-[7px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Intelligence Protocol</span>
+          <div className="flex flex-col items-center text-center space-y-2">
+            <h1 className="text-3xl font-medium tracking-tight text-white/90 font-serif">Digital Volume I</h1>
+            <span className="text-[10px] font-medium text-white/20 uppercase tracking-[0.3em]">Identity Verification Required</span>
           </div>
         </div>
 
-        <div className="flex gap-3 sm:gap-4 mb-8">
+        <div className="flex gap-4 sm:gap-6 mb-12">
           {pin.map((digit, i) => (
             <div
               key={i}
-              className="relative group animate-in slide-in-from-bottom-4 duration-500"
-              style={{ animationDelay: `${i * 50}ms` }}
+              className="relative animate-in slide-in-from-bottom-8 duration-700"
+              style={{ animationDelay: `${i * 100}ms` }}
             >
-              <input
-                ref={el => inputRefs.current[i] = el}
-                type="text"
-                inputMode="numeric"
-                value={digit}
-                onChange={e => handleChange(i, e.target.value)}
-                onKeyDown={e => handleKeyDown(i, e)}
-                className={cn(
-                  "w-10 h-14 sm:w-12 sm:h-16 text-center text-3xl font-light bg-transparent border-b-2 border-white/10 focus:outline-none focus:border-white transition-all text-white",
-                  digit && "border-white",
-                  error && "border-destructive text-destructive animate-shake"
+              <div className={cn(
+                "w-12 h-16 sm:w-14 sm:h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 overflow-hidden",
+                digit ? "border-white/90 bg-white/10" : "border-white/10 bg-white/5 group-hover:border-white/20",
+                error && "border-destructive/50 bg-destructive/5"
+              )}>
+                <input
+                  ref={el => inputRefs.current[i] = el}
+                  type="text"
+                  inputMode="numeric"
+                  value={digit}
+                  onChange={e => handleChange(i, e.target.value)}
+                  onKeyDown={e => handleKeyDown(i, e)}
+                  spellCheck={false}
+                  autoComplete="off"
+                  className={cn(
+                    "absolute inset-0 w-full h-full text-center text-2xl font-medium bg-transparent focus:outline-none transition-all text-white",
+                    error && "text-destructive animate-shake"
+                  )}
+                  autoFocus={i === 0}
+                />
+                {/* Telegram-style fill animation */}
+                <div className={cn(
+                  "w-3 h-3 rounded-full bg-white transition-all duration-300 ease-out transform pointer-events-none",
+                  digit ? "scale-[2.5] opacity-0" : "scale-0 opacity-0",
+                  digit && !error && "animate-ping opacity-20"
+                )} />
+                {digit && !error && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-in zoom-in-50 duration-300">
+                    <span className="text-2xl font-medium text-white">•</span>
+                  </div>
                 )}
-                autoFocus={i === 0}
-              />
-              {digit && !error && (
-                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary animate-in fade-in scale-x-100 duration-300" />
-              )}
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="h-6 flex items-center justify-center">
+        <div className="h-8 flex items-center justify-center">
           {loading ? (
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 flex items-center gap-3">
-              <Sparkles className="h-3 w-3 animate-spin" />
-              <span>Calibrating...</span>
+            <div className="text-[11px] font-medium tracking-widest text-white/60 flex items-center gap-3">
+              <Sparkles className="h-3 w-3 animate-pulse" />
+              <span>Unlocking Vault...</span>
             </div>
           ) : error ? (
-            <div className="text-destructive text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
-              Hash Mismatch
+            <div className="text-destructive/80 text-[11px] font-bold uppercase tracking-[0.2em] animate-pulse">
+              Invalid Sequence
             </div>
           ) : (
-            <div className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/20">
-              Input Security Token
+            <div className="text-[9px] font-medium uppercase tracking-[0.4em] text-white/15 flex items-center gap-3">
+              <Key size={10} className="opacity-50" />
+              <span>Sequence Access Required</span>
             </div>
           )}
         </div>
       </div>
+
+      {/* Decorative Book Corners */}
+      <div className="absolute top-10 left-10 w-20 h-20 border-t border-l border-white/5 rounded-tl-3xl pointer-events-none" />
+      <div className="absolute top-10 right-10 w-20 h-20 border-t border-r border-white/5 rounded-tr-3xl pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-20 h-20 border-b border-l border-white/5 rounded-bl-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-20 h-20 border-b border-r border-white/5 rounded-br-3xl pointer-events-none" />
     </div>
   );
 };
