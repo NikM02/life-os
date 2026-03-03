@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { SplashScreen } from "@/components/SplashScreen";
+import SupabaseAuth from "@/components/SupabaseAuth";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,14 @@ const AppContent = () => {
 
   if (showSplash) {
     return <SplashScreen onSuccess={handleSplashSuccess} />;
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SupabaseAuth />
+      </div>
+    );
   }
 
   return (

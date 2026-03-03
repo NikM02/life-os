@@ -52,7 +52,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              {user ? (
+              {user && (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePush}
@@ -83,14 +83,6 @@ export function Layout({ children }: LayoutProps) {
                     <span className="hidden xs:inline">{pulling ? 'Pulling...' : 'Pull'}</span>
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => setShowAuth(true)}
-                  className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-[11px] font-bold text-primary hover:bg-primary/5 transition-all border border-primary/20 hover:border-primary/40"
-                >
-                  <LogIn className="h-3.5 w-3.5" />
-                  <span>Connect Cloud</span>
-                </button>
               )}
 
               <button
@@ -117,11 +109,6 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </div>
 
-      <Dialog open={showAuth} onOpenChange={setShowAuth}>
-        <DialogContent className="p-0 border-none bg-transparent max-w-xl">
-          <SupabaseAuth />
-        </DialogContent>
-      </Dialog>
     </SidebarProvider>
   );
 }
