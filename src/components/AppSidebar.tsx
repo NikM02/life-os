@@ -29,12 +29,8 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border bg-sidebar-background transition-all duration-300">
       <div className="p-6 pb-4">
         <Link to="/dashboard" className="flex items-center gap-4 mb-2 group">
-          <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all overflow-hidden text-primary font-black text-xl">
-            N
-          </div>
-          <h1 className="text-2xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col">
-            N-OS
-            <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-muted-foreground/40 leading-none">Intelligence.</span>
+          <h1 className="text-xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col">
+            LifeOS
           </h1>
         </Link>
       </div>

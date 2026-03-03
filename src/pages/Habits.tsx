@@ -6,15 +6,14 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import {
-  Plus, Flame, Check, Trash2, Droplets, Moon, Dumbbell,
-  Smile, ChevronLeft, ChevronRight, Activity, Zap, Shield, Sparkles, Heart, BrainCircuit, Download
+  Plus, Check, Trash2, Droplets, Moon, Dumbbell,
+  Smile, ChevronLeft, ChevronRight, Activity, Zap, Shield, Heart, Download
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PageHeader, EmptyState, Button, ProgressBar, CategoryBadge } from '@/components/shared';
+import { PageHeader, EmptyState, Button, CategoryBadge } from '@/components/shared';
 import { format, subDays, addDays, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useData } from '@/contexts/DataContext';
-import { exportAllDataToCSV, exportHabitsDataToCSV } from '@/lib/export-utils';
+import { exportHabitsDataToCSV } from '@/lib/export-utils';
 
 const categories: GoalCategory[] = ['Wealth', 'Health', 'Skills', 'Relationships', 'Spiritual', 'Lifestyle', 'Books', 'Finance', 'Networking'];
 
@@ -67,185 +66,157 @@ export default function Habits() {
   const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   return (
-    <div className="max-w-6xl mx-auto pb-32 px-4 animate-fade-in">
-      <PageHeader title="Habit Protocol" description="Monitor daily performance systems and biological markers.">
+    <div className="max-w-5xl mx-auto pb-32 px-4 animate-fade-in">
+      <PageHeader title="Habits" description="Daily systems and biological markers.">
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          <div className="flex items-center gap-2 bg-secondary/20 p-1 rounded-xl border border-white/5 backdrop-blur-md">
-            <Button variant="ghost" size="icon" onClick={() => navigateDate(-1)} className="h-8 w-8 rounded-lg hover:bg-white/5">
+          <div className="flex items-center gap-2 bg-secondary/10 p-1 rounded-xl border border-border/40">
+            <Button variant="ghost" size="icon" onClick={() => navigateDate(-1)} className="h-8 w-8 rounded-lg">
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="flex flex-col items-center min-w-[100px]">
-              <span className="text-[10px] font-black uppercase tracking-wider">{format(currentDate, 'MMM d, yyyy')}</span>
+            <div className="flex flex-col items-center min-w-[90px]">
+              <span className="text-[10px] font-bold uppercase tracking-wider">{format(currentDate, 'MMM d')}</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => navigateDate(1)} className="h-8 w-8 rounded-lg hover:bg-white/5" disabled={isToday}>
+            <Button variant="ghost" size="icon" onClick={() => navigateDate(1)} className="h-8 w-8 rounded-lg" disabled={isToday}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => exportHabitsDataToCSV(habits, health)}
-            className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+            className="gap-2 rounded-xl px-4 h-10 text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
           >
             <Download className="h-3.5 w-3.5" />
-            Export Data
+            Export
           </Button>
         </div>
       </PageHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-        <div className="glass-card p-6 rounded-3xl border-white/5 bg-indigo-500/5 hover:bg-indigo-500/10 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <Moon className="h-4 w-4 text-indigo-400" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400/60">Sleep Efficiency</span>
+      {/* Minimal Health Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 bg-secondary/5 p-4 rounded-2xl border border-border/20">
+        <div className="flex flex-col gap-1 px-2">
+          <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <Moon className="h-3 w-3" /> Sleep
           </div>
-          <div className="text-3xl font-black tracking-tighter text-indigo-400">{activeHealth.sleep}h</div>
-          <div className="mt-4"><Slider value={[activeHealth.sleep]} onValueChange={([v]) => updateHealth('sleep', v)} max={12} step={0.5} className="h-1" /></div>
-        </div>
-        <div className="glass-card p-6 rounded-3xl border-white/5 bg-primary/5 hover:bg-primary/10 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <Droplets className="h-4 w-4 text-primary" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">Hydration Levels</span>
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-black tracking-tighter">{activeHealth.sleep}h</span>
+            <Slider value={[activeHealth.sleep]} onValueChange={([v]) => updateHealth('sleep', v)} max={12} step={0.5} className="w-16 h-1" />
           </div>
-          <div className="text-3xl font-black tracking-tighter text-primary">{activeHealth.water}L</div>
-          <div className="mt-4"><Slider value={[activeHealth.water]} onValueChange={([v]) => updateHealth('water', v)} max={5} step={0.25} className="h-1" /></div>
         </div>
-        <div className="glass-card p-6 rounded-3xl border-white/5 bg-success/5 hover:bg-success/10 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <Dumbbell className="h-4 w-4 text-success" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-success/60">Activity Pulse</span>
+        <div className="flex flex-col gap-1 px-2 border-l border-border/20">
+          <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <Droplets className="h-3 w-3" /> Water
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-black tracking-tighter">{activeHealth.water}L</span>
+            <Slider value={[activeHealth.water]} onValueChange={([v]) => updateHealth('water', v)} max={5} step={0.25} className="w-16 h-1" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-1 px-2 border-l border-border/20">
+          <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <Dumbbell className="h-3 w-3" /> Workout
           </div>
           <Input
-            placeholder="Log session..."
+            placeholder="Log..."
             value={activeHealth.workout}
             onChange={e => updateHealth('workout', e.target.value)}
-            className="bg-transparent border-none p-0 h-auto text-lg font-black tracking-tight text-success placeholder:text-success/20 focus-visible:ring-0"
+            className="bg-transparent border-none p-0 h-6 text-sm font-bold tracking-tight focus-visible:ring-0 placeholder:text-muted-foreground/20"
           />
         </div>
-        <div className="glass-card p-6 rounded-3xl border-white/5 bg-warning/5 hover:bg-warning/10 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <Smile className="h-4 w-4 text-warning" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-warning/60">Cognitive State</span>
+        <div className="flex flex-col gap-1 px-2 border-l border-border/20">
+          <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <Smile className="h-3 w-3" /> State
           </div>
-          <div className="text-3xl font-black tracking-tighter text-warning">{activeHealth.mood}/10</div>
-          <div className="mt-4"><Slider value={[activeHealth.mood]} onValueChange={([v]) => updateHealth('mood', v)} min={1} max={10} step={1} className="h-1" /></div>
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-black tracking-tighter">{activeHealth.mood}</span>
+            <Slider value={[activeHealth.mood]} onValueChange={([v]) => updateHealth('mood', v)} min={1} max={10} step={1} className="w-16 h-1" />
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-10">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-glow shadow-primary/10">
-            <Activity className="h-6 w-6" />
-          </div>
-          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground/60">System Protocols</h2>
-        </div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Protocols</h2>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="primary" size="sm" className="h-11 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-glow shadow-primary/20">
-              <Plus className="h-4 w-4 mr-2" /> New Protocol
+            <Button variant="ghost" size="sm" className="h-8 px-3 rounded-lg font-bold uppercase tracking-widest text-[9px] border border-border/40 hover:bg-secondary/50">
+              <Plus className="h-3.5 w-3.5 mr-1.5" /> New
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md glass-card border-white/10 p-0 overflow-hidden rounded-[2rem]">
-            <div className="bg-primary/5 p-8 border-b border-white/5">
-              <DialogHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                    <Shield className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Habit Architecture</span>
-                </div>
-                <DialogTitle className="text-2xl font-black uppercase tracking-tight text-foreground">New Habit Protocol</DialogTitle>
-              </DialogHeader>
-            </div>
-            <div className="p-8 space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Protocol Name</label>
-                <Input placeholder="System action..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="bg-secondary/30 border-white/5 rounded-xl h-12 font-bold text-foreground placeholder:text-muted-foreground/20" />
+          <DialogContent className="max-w-md bg-background border border-border/40 p-6 rounded-2xl shadow-2xl">
+            <DialogHeader className="mb-6">
+              <DialogTitle className="text-lg font-black uppercase tracking-tight">New Habit</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Name</label>
+                <Input placeholder="Activity description..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="bg-secondary/20 border-border/20 rounded-xl h-10 text-sm font-medium" />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Domain</label>
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 ml-1">Domain</label>
                 <Select value={form.category} onValueChange={v => setForm({ ...form, category: v as GoalCategory })}>
-                  <SelectTrigger className="bg-secondary/30 border-white/5 rounded-xl h-12 font-bold text-foreground"><SelectValue /></SelectTrigger>
-                  <SelectContent className="glass-card border-white/10 rounded-xl">{categories.map(c => <SelectItem key={c} value={c} className="font-bold text-xs">{c}</SelectItem>)}</SelectContent>
+                  <SelectTrigger className="bg-secondary/20 border-border/20 rounded-xl h-10 text-sm font-medium"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-background border-border/40 rounded-xl">{categories.map(c => <SelectItem key={c} value={c} className="text-xs font-medium">{c}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <Button variant="primary" onClick={addHabit} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs mt-4 shadow-glow shadow-primary/20">Initialize Protocol</Button>
+              <Button onClick={addHabit} className="w-full h-11 rounded-xl font-bold uppercase tracking-widest text-[10px] mt-2">Create Protocol</Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
       {habits.length === 0 ? (
-        <EmptyState title="No Systems Active" description="Initialize your first habit protocol to begin performance tracking.">
-          <Button variant="primary" size="sm" onClick={() => setOpen(true)} className="rounded-xl h-10 px-6 font-black uppercase tracking-widest text-[10px]">
-            <Plus className="h-4 w-4 mr-2" /> Start System
+        <EmptyState title="Systems Offline" description="Initialize your first performance protocol.">
+          <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="rounded-xl h-9 px-6 font-bold uppercase tracking-widest text-[9px]">
+            <Plus className="h-3.5 w-3.5 mr-2" /> Start
           </Button>
         </EmptyState>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {habits.map(habit => {
             const doneToday = habit.completedDates.includes(dateStr);
             return (
-              <div key={habit.id} className="glass-card p-8 group relative hover:border-primary/30 transition-all duration-700 rounded-[2.5rem] overflow-hidden animate-slide-up shadow-xl hover:shadow-primary/5">
-                <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none transform scale-150 rotate-12 group-hover:opacity-[0.06] group-hover:scale-[1.7] transition-all duration-1000">
-                  <Zap className="h-16 w-16 text-primary" />
-                </div>
-
-                <div className="flex items-start justify-between mb-8 relative z-10">
+              <div key={habit.id} className="group bg-background/50 border border-border/20 p-6 rounded-3xl hover:border-primary/40 transition-all duration-500">
+                <div className="flex items-start justify-between mb-6">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <CategoryBadge category={habit.category} />
-                      {habit.streak > 5 && <div className="p-1 px-3 rounded-full bg-warning/10 text-warning text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-warning/20">
-                        <Flame className="h-3 w-3" /> Hot Streak
-                      </div>}
-                    </div>
-                    <h3 className="text-xl font-black tracking-tight group-hover:text-primary transition-colors leading-tight text-foreground/90">{habit.name}</h3>
+                    <CategoryBadge category={habit.category} className="mb-2 opacity-60" />
+                    <h3 className="text-base font-black tracking-tight text-foreground/90">{habit.name}</h3>
                   </div>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <Button variant="ghost" size="icon" onClick={() => deleteHabit(habit.id)} className="h-10 w-10 rounded-xl bg-white/5 hover:bg-destructive/10 hover:text-destructive">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => deleteHabit(habit.id)} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
 
-                <div className="flex items-center justify-between mb-8 relative z-10 p-5 rounded-3xl bg-secondary/20 border border-white/5">
-                  <div className="flex items-center gap-4 px-2">
-                    <div className="flex flex-col items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30 mb-1">Streak</span>
-                      <span className="text-3xl font-black italic tracking-tighter text-warning">{habit.streak}</span>
-                    </div>
-                    <div className="h-10 w-[1px] bg-white/5 mx-2" />
-                    <div className="flex flex-col items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30 mb-1">Reliability</span>
-                      <span className="text-3xl font-black italic tracking-tighter text-primary">{habit.completedDates.length > 0 ? Math.round((habit.completedDates.length / 30) * 100) : 0}%</span>
-                    </div>
+                <div className="flex items-center justify-between mb-6 p-4 rounded-2xl bg-secondary/10 border border-border/20">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black tracking-tighter text-primary">{habit.streak}</span>
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Streak</span>
                   </div>
                   <button
                     onClick={() => toggleHabit(habit.id)}
                     className={cn(
-                      "w-16 h-16 rounded-2xl border-2 flex items-center justify-center transition-all duration-700 shadow-glow shadow-primary/0",
+                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
                       doneToday
-                        ? "bg-primary border-primary text-primary-foreground shadow-primary/20 scale-105"
-                        : "bg-background border-white/5 text-muted-foreground/20 hover:border-primary/50 hover:text-muted-foreground/60"
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+                        : "bg-secondary/40 text-muted-foreground/30 hover:bg-secondary/60 hover:text-muted-foreground/50"
                     )}
                   >
-                    <Check className={cn("h-9 w-9 transition-transform duration-700", doneToday ? "scale-110" : "scale-50 opacity-10")} />
+                    <Check className={cn("h-6 w-6 transition-all", doneToday ? "scale-100" : "scale-50 opacity-0")} />
                   </button>
                 </div>
 
-                <div className="pt-6 border-t border-white/5 flex gap-2 justify-between relative z-10">
+                <div className="pt-4 border-t border-border/10 flex gap-2 justify-between">
                   {last7.map((date) => {
                     const done = habit.completedDates.includes(date);
                     const isCurrent = date === dateStr;
                     return (
-                      <div key={date} className="flex flex-col items-center gap-2 flex-1">
+                      <div key={date} className="flex flex-col items-center gap-1.5 flex-1">
                         <div className={cn(
-                          "text-[8px] font-black uppercase tracking-widest",
-                          isCurrent ? "text-primary font-bold" : "text-muted-foreground/20"
+                          "text-[7px] font-bold uppercase tracking-widest",
+                          isCurrent ? "text-primary" : "text-muted-foreground/30"
                         )}>{weekDays[new Date(date).getDay()]}</div>
                         <div className={cn(
-                          "h-2 w-full rounded-full transition-all duration-500",
-                          done ? "bg-primary shadow-glow shadow-primary/40" : "bg-white/5"
+                          "h-1 w-full rounded-full transition-all duration-500",
+                          done ? "bg-primary/80" : "bg-secondary/40"
                         )} />
                       </div>
                     );
