@@ -2,12 +2,9 @@ import {
   Sparkles, LayoutDashboard, Target, Clock, Heart, BarChart3, Eye, ListChecks, Wallet, Layers, Clapperboard, BookOpen, LogOut, LogIn, ShieldAlert,
   CalendarCheck, Timer, BrainCircuit
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import { NavLink } from '@/components/NavLink';
 import { useData } from '@/contexts/DataContext';
 import { useState } from 'react';
-import SupabaseAuth from '@/components/SupabaseAuth';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
@@ -26,7 +23,6 @@ const navItems = [
 ];
 
 export function AppSidebar() {
-  const { user } = useData();
   const navigate = useNavigate();
 
   return (
@@ -68,17 +64,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <div className="mt-auto p-4 border-t border-border/10">
-        {user && (
-          <Link
-            to="/logout"
-            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 border border-destructive/20 transition-all group shadow-sm active:scale-95"
-          >
-            <LogOut className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            <span>Secure Logout</span>
-          </Link>
-        )}
-      </div>
+
     </Sidebar>
   );
 }

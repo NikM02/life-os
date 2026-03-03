@@ -1,6 +1,5 @@
 import React, { createContext, useContext, ReactNode, useRef } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { supabase } from '@/lib/supabase';
 import {
     VisionData, Goal, ExecutionData, Transaction,
     Investment, Budget, ContentPipelineData, KnowledgeEntry, Habit, HealthEntry,
@@ -34,17 +33,11 @@ interface DataContextType {
     setReviews: (data: WeeklyReview[]) => void;
     reflections: DailyReflection[];
     setReflections: (data: DailyReflection[]) => void;
-    user: any | null;
-    pushAllToCloud: () => Promise<void>;
-    pullFromCloud: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = React.useState<any | null>(null);
-    const [isInitialLoadDone, setIsInitialLoadDone] = React.useState(false);
-
     const [vision, setVision] = useLocalStorage<VisionData>('lifeos-vision', {
         principles: [],
         threeYearVision: '',
@@ -71,193 +64,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [reviews, setReviews] = useLocalStorage<WeeklyReview[]>('lifeos-reviews', []);
     const [reflections, setReflections] = useLocalStorage<DailyReflection[]>('lifeos-reflections', []);
 
-    // Handle Auth changes
-    React.useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-        });
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
-
-    const toSnakeCase = (obj: any) => {
-        const snake: any = {};
-        for (const key in obj) {
-            const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-            snake[snakeKey] = obj[key];
-        }
-        return snake;
-    };
-
-    const toCamelCase = (obj: any) => {
-        const camel: any = {};
-        for (const key in obj) {
-            const camelKey = key.replace(/([-_][a-z])/g, group =>
-                group.toUpperCase().replace('-', '').replace('_', '')
-            );
-            camel[camelKey] = obj[key];
-        }
-        return camel;
-    };
-
-    const pullFromCloud = async () => {
-        if (!user) {
-            setIsInitialLoadDone(false);
-            return;
-        }
-
-        const tables = ['vision', 'goals', 'execution', 'transactions', 'investments', 'budgets', 'content', 'library', 'habits', 'health', 'blocks', 'reviews', 'reflections'];
-
-        for (const table of tables) {
-            const { data, error } = await supabase
-                .from(table)
-                .select('*')
-                .eq('user_id', user.id);
-
-            if (data && !error) {
-                if (data.length > 0) {
-                    // Data exists in Supabase, load it
-                    const mappedData = data.map(item => toCamelCase(item));
-                    switch (table) {
-                        case 'vision': if (data[0]) setVision(data[0].data); break;
-                        case 'goals': setGoals(mappedData); break;
-                        case 'execution': if (data[0]) setExecution(data[0].data); break;
-                        case 'transactions': setTransactions(mappedData); break;
-                        case 'investments': setInvestments(mappedData); break;
-                        case 'budgets': setBudgets(mappedData); break;
-                        case 'content': if (data[0]) setContent(data[0].data); break;
-                        case 'library': setLibrary(mappedData); break;
-                        case 'habits': setHabits(mappedData); break;
-                        case 'health': setHealth(mappedData); break;
-                        case 'blocks': setBlocks(mappedData); break;
-                        case 'reviews': setReviews(mappedData); break;
-                        case 'reflections': setReflections(mappedData); break;
-                    }
-                } else {
-                    // Table is empty in Supabase, check if we have local data to push
-                    let localData: any = null;
-                    let isArray = true;
-                    switch (table) {
-                        case 'vision': localData = vision; isArray = false; break;
-                        case 'goals': localData = goals; break;
-                        case 'execution': localData = execution; isArray = false; break;
-                        case 'transactions': localData = transactions; break;
-                        case 'investments': localData = investments; break;
-                        case 'budgets': localData = budgets; break;
-                        case 'content': localData = content; isArray = false; break;
-                        case 'library': localData = library; break;
-                        case 'habits': localData = habits; break;
-                        case 'health': localData = health; break;
-                        case 'blocks': localData = blocks; break;
-                        case 'reviews': localData = reviews; break;
-                        case 'reflections': localData = reflections; break;
-                    }
-
-                    if (localData && (isArray ? localData.length > 0 : Object.keys(localData).length > 0)) {
-                        console.log(`Initial push for table ${table}`);
-                        if (isArray) {
-                            const snakeData = localData.map((item: any) => ({ ...toSnakeCase(item), user_id: user.id }));
-                            await supabase.from(table).insert(snakeData);
-                        } else {
-                            await supabase.from(table).upsert({ user_id: user.id, data: localData, updated_at: new Date().toISOString() });
-                        }
-                    }
-                }
-            }
-        }
-        setIsInitialLoadDone(true);
-    };
-
-    React.useEffect(() => {
-        pullFromCloud();
-    }, [user]);
-
-    const syncTimers = useRef<{ [key: string]: NodeJS.Timeout }>({});
-
-    const debouncedSync = (table: string, data: any, isArray: boolean = true) => {
-        if (!user || !isInitialLoadDone) return;
-
-        if (syncTimers.current[table]) {
-            clearTimeout(syncTimers.current[table]);
-        }
-
-        syncTimers.current[table] = setTimeout(() => {
-            sync(table, data, isArray);
-        }, 2000); // 2 second debounce
-    };
-
-    // Automated Synchronization Hooks
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('vision', vision, false); }, [vision]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('goals', goals, true); }, [goals]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('execution', execution, false); }, [execution]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('transactions', transactions, true); }, [transactions]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('investments', investments, true); }, [investments]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('budgets', budgets, true); }, [budgets]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('content', content, false); }, [content]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('library', library, true); }, [library]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('habits', habits, true); }, [habits]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('health', health, true); }, [health]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('blocks', blocks, true); }, [blocks]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('reviews', reviews, true); }, [reviews]);
-    React.useEffect(() => { if (isInitialLoadDone) debouncedSync('reflections', reflections, true); }, [reflections]);
-
-    // Sync helpers (generic upsert)
-    const sync = async (table: string, data: any, isArray: boolean = true) => {
-        if (!user || !isInitialLoadDone) return;
-
-        try {
-            if (isArray) {
-                // Delete existing records to sync fresh (simple replacement)
-                const { error: deleteError } = await supabase.from(table).delete().eq('user_id', user.id);
-                if (deleteError) throw deleteError;
-
-                if (data.length > 0) {
-                    const snakeData = data.map((item: any) => ({ ...toSnakeCase(item), user_id: user.id }));
-                    const { error: insertError } = await supabase.from(table).insert(snakeData);
-                    if (insertError) throw insertError;
-                }
-            } else {
-                // Upsert single objects (stored in JSONB 'data' column, so no mapping needed for internal keys)
-                await supabase.from(table).upsert({
-                    user_id: user.id,
-                    data,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'user_id' });
-            }
-        } catch (err) {
-            console.error(`Sync error for table ${table}:`, err);
-        }
-    };
-
-    // Manual push all data to Supabase
-    const pushAllToCloud = async () => {
-        if (!user || !isInitialLoadDone) return;
-
-        const tables = [
-            { name: 'vision', data: vision, isArray: false },
-            { name: 'goals', data: goals, isArray: true },
-            { name: 'execution', data: execution, isArray: false },
-            { name: 'transactions', data: transactions, isArray: true },
-            { name: 'investments', data: investments, isArray: true },
-            { name: 'budgets', data: budgets, isArray: true },
-            { name: 'content', data: content, isArray: false },
-            { name: 'library', data: library, isArray: true },
-            { name: 'habits', data: habits, isArray: true },
-            { name: 'health', data: health, isArray: true },
-            { name: 'blocks', data: blocks, isArray: true },
-            { name: 'reviews', data: reviews, isArray: true },
-            { name: 'reflections', data: reflections, isArray: true },
-        ];
-
-        for (const table of tables) {
-            await sync(table.name, table.data, table.isArray);
-        }
-    };
-
     return (
         <DataContext.Provider value={{
             vision, setVision,
@@ -273,9 +79,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             blocks, setBlocks,
             reviews, setReviews,
             reflections, setReflections,
-            user,
-            pushAllToCloud,
-            pullFromCloud
         }}>
             {children}
         </DataContext.Provider>

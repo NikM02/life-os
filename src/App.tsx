@@ -15,19 +15,14 @@ import Finance from "./pages/Finance";
 import Execution from "./pages/Execution";
 import ContentPipeline from "./pages/ContentPipeline";
 import DailyReflections from "./pages/DailyReflections";
-import Logout from "./pages/Logout";
 import NotFound from "./pages/NotFound";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import { SplashScreen } from "@/components/SplashScreen";
-import SupabaseAuth from "@/components/SupabaseAuth";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(() => {
     return sessionStorage.getItem("splashShown") !== "true";
   });
@@ -37,42 +32,8 @@ const AppContent = () => {
     setShowSplash(false);
   };
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-2 w-48 bg-secondary rounded-full overflow-hidden">
-            <div className="h-full bg-primary animate-progress-loading" />
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 italic">Initializing Systems</span>
-        </div>
-      </div>
-    );
-  }
-
   if (showSplash) {
     return <SplashScreen onSuccess={handleSplashSuccess} />;
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-background">
-        <SupabaseAuth />
-      </div>
-    );
   }
 
   return (
@@ -89,7 +50,6 @@ const AppContent = () => {
           <Route path="/finance" element={<Finance />} />
           <Route path="/library" element={<Library />} />
           <Route path="/neural-journals" element={<DailyReflections />} />
-          <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
