@@ -131,18 +131,18 @@ export default function Vision() {
   return (
     <div className="max-w-6xl mx-auto space-y-16 pb-32 px-4 animate-fade-in">
       <PageHeader
-        title="N-OS Vision"
-        description="Life intelligence and guiding principles."
+        title="N-OS Strategic Vision"
+        description="Core guidance and future roadmap."
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <Button
             variant="outline"
             size="sm"
             onClick={() => exportVisionDataToCSV(vision)}
-            className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
+            className="flex items-center gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary z-50 pointer-events-auto"
           >
             <Download className="h-3.5 w-3.5" />
-            Export Vision
+            <span className="inline">Export Vision</span>
           </Button>
         </div>
       </PageHeader>
@@ -156,7 +156,7 @@ export default function Vision() {
             <Section
               key={`principle-${i}`}
               title={`Principle ${i + 1}`}
-              icon={[Cpu, Network, Command][i]}
+              icon={[Shield, Zap, Target][i]}
               path={`principles.${i}`}
               value={p}
               placeholder="Enter a guiding principle..."

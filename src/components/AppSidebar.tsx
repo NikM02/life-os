@@ -19,8 +19,7 @@ const navItems = [
   { title: 'Affirmations', url: '/', icon: Sparkles },
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Vision', url: '/vision', icon: Eye },
-  { title: 'Mission', url: '/mission', icon: Target },
-  { title: 'Goal Mastery', url: '/goals', icon: Target },
+  { title: 'Focus Track', url: '/goals', icon: Target },
   { title: 'Daily Execution', url: '/execution', icon: Layers },
   { title: 'Neural Journals', url: '/neural-journals', icon: BrainCircuit },
   { title: 'Content Pipeline', url: '/content', icon: Clapperboard },
@@ -36,8 +35,8 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border bg-sidebar-background transition-all duration-300">
       <div className="p-6 pb-4">
         <Link to="/dashboard" className="flex items-center gap-4 mb-2 group">
-          <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all overflow-hidden">
-            <img src="/logo.png" alt="N-OS Logo" className="h-8 w-8 object-contain" />
+          <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all overflow-hidden text-primary font-black text-xl">
+            N
           </div>
           <h1 className="text-2xl font-black tracking-tighter text-foreground group-hover:opacity-80 transition-opacity flex flex-col">
             N-OS

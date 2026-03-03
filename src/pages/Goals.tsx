@@ -110,7 +110,7 @@ export default function Goals() {
 
   return (
     <div className="max-w-6xl mx-auto pb-32 px-4 animate-fade-in">
-      <PageHeader title="Missions" description="Strategize and execute with precision. Deploy high-impact operations.">
+      <PageHeader title="Focus Track" description="Strategic objectives and high-impact operations.">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -119,12 +119,12 @@ export default function Goals() {
             className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl px-4 h-10 transition-all text-[9px] font-extrabold uppercase tracking-widest text-primary"
           >
             <Download className="h-3.5 w-3.5" />
-            Export Missions
+            Export Objectives
           </Button>
           <Dialog open={open} onOpenChange={(val) => { if (!val) closeDialog(); setOpen(val); }}>
             <DialogTrigger asChild>
               <Button variant="primary" size="sm" className="h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[10px]">
-                <Plus className="h-4 w-4 mr-2" /> New Mission
+                <Plus className="h-4 w-4 mr-2" /> New Objective
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md glass-card border-white/10 p-0 overflow-hidden rounded-[2rem]">
@@ -132,24 +132,24 @@ export default function Goals() {
                 <DialogHeader>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Rocket className="h-5 w-5" />
+                      <Target className="h-5 w-5" />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Mission Protocol</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Objective Protocol</span>
                   </div>
                   <DialogTitle className="text-2xl font-black uppercase tracking-tight text-foreground">
-                    {editingGoal ? 'Recalibrate' : 'Initiate'} Mission
+                    {editingGoal ? 'Recalibrate' : 'Initiate'} Objective
                   </DialogTitle>
                 </DialogHeader>
               </div>
 
               <div className="p-8 space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Mission Title</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Objective Title</label>
                   <Input placeholder="Operation name..." value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="bg-secondary/30 border-white/5 rounded-xl h-12 font-bold text-foreground placeholder:text-muted-foreground/20" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Core Objective</label>
-                  <Input placeholder="Mission details..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="bg-secondary/30 border-white/5 rounded-xl h-12 font-bold text-foreground placeholder:text-muted-foreground/20" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Core Requirement</label>
+                  <Input placeholder="Focus details..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="bg-secondary/30 border-white/5 rounded-xl h-12 font-bold text-foreground placeholder:text-muted-foreground/20" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -186,7 +186,7 @@ export default function Goals() {
                 </div>
 
                 <Button variant="primary" onClick={saveGoal} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs mt-4 shadow-glow shadow-primary/20">
-                  {editingGoal ? 'Update Mission' : 'Deploy Mission'}
+                  {editingGoal ? 'Update Objective' : 'Deploy Objective'}
                 </Button>
               </div>
             </DialogContent>
@@ -219,9 +219,9 @@ export default function Goals() {
 
       {
         filtered.length === 0 ? (
-          <EmptyState title="Operational Void" description="Deploy your first mission parameters to begin tracking performance.">
+          <EmptyState title="Operational Void" description="Deploy your first objective parameters to begin tracking performance.">
             <Button variant="primary" size="sm" onClick={() => setOpen(true)} className="rounded-xl h-10 px-6 font-black uppercase tracking-widest text-[10px]">
-              <Plus className="h-4 w-4 mr-2" /> Initiate Mission
+              <Plus className="h-4 w-4 mr-2" /> Initiate Objective
             </Button>
           </EmptyState>
         ) : (
@@ -262,7 +262,7 @@ export default function Goals() {
 
                   <div className="mb-8 relative z-10">
                     <p className="text-sm font-medium text-muted-foreground/80 leading-relaxed italic line-clamp-2">
-                      {goal.description || "No specific mission parameters defined."}
+                      {goal.description || "No specific objective parameters defined."}
                     </p>
                   </div>
 
