@@ -170,7 +170,7 @@ export default function Finance() {
                     label="Current Balance"
                     value={formatCurrency(balance)}
                     icon={<Wallet />}
-                    className="bg-primary text-primary-foreground border-none shadow-xl shadow-primary/10"
+                    className="bg-transparent border-solid"
                 />
                 <StatCard
                     label="Total Inflow"
