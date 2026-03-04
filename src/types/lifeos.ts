@@ -1,22 +1,33 @@
+export interface VisionPillar {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface VisionObjective {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface VisionArea {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export interface VisionData {
-  principles: string[];
+  pillars: VisionPillar[]; // 3 core pillars
   threeYearVision: string;
   oneYearVision: string;
-  quarterlyGoals: {
-    q1: string;
-    q2: string;
-    q3: string;
-    q4: string;
-  };
-  coreSections: {
+  objectives: VisionObjective[]; // 5 core objectives
+  areas: {
     health: string;
-    family: string;
     career: string;
-    financial: string;
-    personalGrowth: string;
-    spirituality: string;
-    socialImpact: string;
-    joyExperience: string;
+    family: string;
+    personal: string;
+    finance: string;
+    relationship: string;
   };
 }
 
@@ -39,6 +50,7 @@ export interface Goal {
   toDate?: string;
   remarks?: string;
   linkedIds?: string[];
+  quarter?: 'Q1' | 'Q2' | 'Q3' | 'Q4';
 }
 
 export interface TimeBlock {
@@ -51,11 +63,6 @@ export interface TimeBlock {
   date: string;
 }
 
-export interface DailyReflection {
-  id: string;
-  date: string;
-  text: string;
-}
 
 export interface Habit {
   id: string;
@@ -63,6 +70,11 @@ export interface Habit {
   category: GoalCategory;
   streak: number;
   completedDates: string[];
+  priority: 'Low' | 'Medium' | 'High';
+  startDate?: string;
+  endDate?: string;
+  weekdays?: number[]; // 0-6 for Sun-Sat
+  description?: string;
 }
 
 export interface HealthEntry {
@@ -71,7 +83,10 @@ export interface HealthEntry {
   water: number;
   workout: string;
   mood: number;
+  energy: number;
 }
+
+export type HealthData = HealthEntry;
 
 export interface WeeklyReview {
   id: string;
@@ -105,6 +120,7 @@ export interface Investment {
   type: InvestmentType;
   amount: number;
   date: string;
+  description?: string;
 }
 
 export interface Budget {
@@ -112,6 +128,7 @@ export interface Budget {
   month: string; // YYYY-MM
   category: string;
   limit: number;
+  spent?: number;
 }
 
 export interface FinanceDistribution {
@@ -158,6 +175,9 @@ export interface ContentItem {
   hook?: string;
   description?: string;
   dueDate?: string;
+  startDate?: string;
+  endDate?: string;
+  velocity?: number; // Represented in hours
   publishedDate?: string;
   // Performance
   views48h?: number;
@@ -192,5 +212,6 @@ export interface KnowledgeEntry {
   link?: string;
   isLiked: boolean;
   createdAt: string;
+  deadline?: string;
   linkedIds?: string[];
 }

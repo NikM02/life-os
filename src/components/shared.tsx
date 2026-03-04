@@ -108,7 +108,7 @@ export function ProgressBar({ value, className }: { value: number; className?: s
 
 export function EmptyState({ title, description, children }: { title: string; description: string; children?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border/20 rounded-3xl group">
+    <div className="flex flex-col items-center justify-center py-20 text-center border border-border/20 rounded-3xl group">
       <h3 className="text-xl font-semibold tracking-tight mb-2 text-foreground/40 group-hover:text-foreground/60 transition-colors">{title}</h3>
       <p className="text-sm font-medium text-muted-foreground/30 mb-8 max-w-xs leading-relaxed">{description}</p>
       {children}

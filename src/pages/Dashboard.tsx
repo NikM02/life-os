@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import {
-  Moon, Droplets, Flame, Smile, BrainCircuit, TrendingUp, TrendingDown, IndianRupee, Activity
+  Moon, Droplets, Flame, Smile, BrainCircuit, TrendingUp, TrendingDown, IndianRupee, Activity, Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { CategoryBadge, StatCard } from '@/components/shared';
 
 export default function Dashboard() {
-  const { vision, goals, execution, transactions, health, reflections } = useData();
+  const { vision, goals, execution, transactions, health } = useData();
 
   const totalIncome = useMemo(() =>
     (transactions || []).filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0),
@@ -23,14 +23,10 @@ export default function Dashboard() {
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const todayHealth = useMemo(() =>
-    (health || []).find(h => h.date === today) || { sleep: 0, water: 0, workout: '', mood: 5 },
+    (health || []).find(h => h.date === today) || { sleep: 0, water: 0, workout: '', mood: 5, energy: 5 },
     [health, today]
   );
 
-  const todayReflection = useMemo(() =>
-    (reflections || []).find(r => r.date === today),
-    [reflections, today]
-  );
 
   const [missionsEmblaRef] = useEmblaCarousel({ align: 'start', loop: false });
   const [executionEmblaRef] = useEmblaCarousel({ align: 'start', loop: false });
@@ -57,7 +53,7 @@ export default function Dashboard() {
             { label: 'Water', value: `${todayHealth.water}L`, icon: Droplets },
             { label: 'Activity', value: todayHealth.workout || 'Nominal', icon: Flame },
             { label: 'Neuro', value: `${todayHealth.mood}/10`, icon: Smile },
-            { label: 'Journal', value: todayReflection ? 'Captured' : 'Pending', icon: BrainCircuit }
+            { label: 'Energy', value: `${todayHealth.energy || 0}/10`, icon: Zap }
           ].map((item, i) => (
             <div key={i} className="flex flex-col gap-3 p-6 bg-secondary/20 rounded-3xl border border-border/5 group hover:border-primary/20 transition-all duration-500">
               <div className="flex items-center gap-3 opacity-20 group-hover:opacity-40 transition-opacity">
@@ -102,7 +98,7 @@ export default function Dashboard() {
           <div className="embla overflow-hidden" ref={missionsEmblaRef}>
             <div className="embla__container flex gap-6">
               {(!goals || goals.filter(g => g.status !== 'Completed').length === 0) ? (
-                <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/10 p-12 rounded-3xl text-center opacity-20">
+                <div className="embla__slide flex-[0_0_100%] border border-border/10 p-12 rounded-3xl text-center opacity-20">
                   <span className="text-xs font-medium italic">No active objectives</span>
                 </div>
               ) : (
@@ -137,7 +133,7 @@ export default function Dashboard() {
         <div className="embla overflow-hidden" ref={executionEmblaRef}>
           <div className="embla__container flex gap-6">
             {(!execution || !execution.tasks || execution.tasks.filter(e => e.status !== 'Done').length === 0) ? (
-              <div className="embla__slide flex-[0_0_100%] border border-dashed border-border/10 p-12 rounded-3xl text-center opacity-20">
+              <div className="embla__slide flex-[0_0_100%] border border-border/10 p-12 rounded-3xl text-center opacity-20">
                 <span className="text-xs font-medium italic">System optimized</span>
               </div>
             ) : (

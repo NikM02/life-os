@@ -13,7 +13,6 @@ import Library from "./pages/Library";
 import Finance from "./pages/Finance";
 import Execution from "./pages/Execution";
 import ContentPipeline from "./pages/ContentPipeline";
-import DailyReflections from "./pages/DailyReflections";
 import NotFound from "./pages/NotFound";
 
 import { useState } from "react";
@@ -48,7 +47,6 @@ const AppContent = () => {
           <Route path="/content" element={<ContentPipeline />} />
           <Route path="/finance" element={<Finance />} />
           <Route path="/library" element={<Library />} />
-          <Route path="/neural-journals" element={<DailyReflections />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

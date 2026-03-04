@@ -3,7 +3,7 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import {
     VisionData, Goal, ExecutionData, Transaction,
     Investment, Budget, ContentPipelineData, KnowledgeEntry, Habit, HealthEntry,
-    TimeBlock, WeeklyReview, DailyReflection
+    TimeBlock, WeeklyReview
 } from '@/types/lifeos';
 
 interface DataContextType {
@@ -31,21 +31,33 @@ interface DataContextType {
     setBlocks: (data: TimeBlock[]) => void;
     reviews: WeeklyReview[];
     setReviews: (data: WeeklyReview[]) => void;
-    reflections: DailyReflection[];
-    setReflections: (data: DailyReflection[]) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [vision, setVision] = useLocalStorage<VisionData>('lifeos-vision', {
-        principles: [],
+        pillars: [
+            { id: '1', title: 'Pillar I', description: '' },
+            { id: '2', title: 'Pillar II', description: '' },
+            { id: '3', title: 'Pillar III', description: '' }
+        ],
         threeYearVision: '',
         oneYearVision: '',
-        quarterlyGoals: { q1: '', q2: '', q3: '', q4: '' },
-        coreSections: {
-            health: '', family: '', career: '', financial: '',
-            personalGrowth: '', spirituality: '', socialImpact: '', joyExperience: ''
+        objectives: [
+            { id: '1', title: 'Objective 1', description: '' },
+            { id: '2', title: 'Objective 2', description: '' },
+            { id: '3', title: 'Objective 3', description: '' },
+            { id: '4', title: 'Objective 4', description: '' },
+            { id: '5', title: 'Objective 5', description: '' }
+        ],
+        areas: {
+            health: '',
+            career: '',
+            family: '',
+            personal: '',
+            finance: '',
+            relationship: ''
         }
     });
     const [goals, setGoals] = useLocalStorage<Goal[]>('lifeos-goals', []);
@@ -62,7 +74,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [health, setHealth] = useLocalStorage<HealthEntry[]>('lifeos-health', []);
     const [blocks, setBlocks] = useLocalStorage<TimeBlock[]>('lifeos-blocks', []);
     const [reviews, setReviews] = useLocalStorage<WeeklyReview[]>('lifeos-reviews', []);
-    const [reflections, setReflections] = useLocalStorage<DailyReflection[]>('lifeos-reflections', []);
 
     return (
         <DataContext.Provider value={{
@@ -78,7 +89,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             health, setHealth,
             blocks, setBlocks,
             reviews, setReviews,
-            reflections, setReflections,
         }}>
             {children}
         </DataContext.Provider>

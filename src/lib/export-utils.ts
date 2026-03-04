@@ -1,4 +1,4 @@
-import { Goal, Habit, HealthEntry, TimeBlock, WeeklyReview, Transaction, Investment, VisionData, Budget } from '@/types/lifeos';
+import { Goal, Habit, HealthEntry, TimeBlock, WeeklyReview, Transaction, Investment, VisionData, Budget, ContentPipelineData } from '@/types/lifeos';
 import { formatCurrency } from './finance-utils';
 
 export const exportAllDataToCSV = () => {
@@ -14,198 +14,84 @@ export const exportAllDataToCSV = () => {
     const content: { items: any[] } = JSON.parse(localStorage.getItem('lifeos-content') || '{"items":[]}');
     const library: any[] = JSON.parse(localStorage.getItem('lifeos-library') || '[]');
     const budgets: Budget[] = JSON.parse(localStorage.getItem('lifeos-budgets') || '[]');
-    const reflections: any[] = JSON.parse(localStorage.getItem('lifeos-reflections') || '[]');
 
     const rows: string[][] = [
-      ['Date/Month', 'Type', 'Item', 'Status/Value', 'Details']
+      ['Category', 'Sub-Category', 'Item', 'Status/Value', 'Details']
     ];
 
-    // Process Vision
-    if (vision.oneYearVision) rows.push(['Vision', '1-Year', 'Vision Text', vision.oneYearVision, 'Main Vision']);
-    if (vision.threeYearVision) rows.push(['Vision', '3-Year', 'Vision Text', vision.threeYearVision, 'Long-term Vision']);
-    if (vision.principles) vision.principles.forEach((p, i) => rows.push(['Vision', 'Principle', `Principle ${i + 1}`, p, 'Guiding Principle']));
+    // Vision
+    if (vision.threeYearVision) rows.push(['Vision', '3-Year', 'Trajectory', vision.threeYearVision, 'Long-term']);
+    if (vision.oneYearVision) rows.push(['Vision', '1-Year', 'Azimuth', vision.oneYearVision, 'Short-term']);
+    (vision.pillars || []).forEach(p => rows.push(['Vision', 'Pillar', p.title, p.description, 'Core Pillar']));
+    (vision.objectives || []).forEach(o => rows.push(['Vision', 'Objective', o.title, o.description, 'Core Objective']));
 
-    // Process Content
-    if (content.items) {
-      content.items.forEach(item => {
-        rows.push([item.dueDate || 'Unknown', 'Content', item.title, item.status, `Channel: ${item.channel}, Priority: ${item.priority}`]);
-      });
-    }
+    // Content
+    (content.items || []).forEach(item => {
+      rows.push(['Content', item.channel, item.title, item.status, `Priority: ${item.priority}`]);
+    });
 
-    // Process Library
+    // Library
     library.forEach(entry => {
-      rows.push(['Unknown', 'Library', entry.name, entry.status, `Category: ${entry.category}`]);
+      rows.push(['Library', entry.category, entry.name, entry.status, '']);
     });
 
-    // Process Budgets
+    // Finance
     budgets.forEach(b => {
-      rows.push([b.month, 'Budget', b.category, formatCurrency(b.limit), 'Monthly Limit']);
+      rows.push(['Finance', 'Budget', b.category, formatCurrency(b.limit), b.month]);
     });
-
-    // Process Reflections
-    reflections.forEach(r => {
-      rows.push([r.date, 'Reflection', 'Daily Entry', r.text.slice(0, 50) + '...', 'Day Reflection']);
-    });
-
-    // Process Goals
-    goals.forEach(goal => {
-      const date = goal.createdAt ? new Date(goal.createdAt).toISOString().slice(0, 7) : 'Unknown';
-      rows.push([date, 'Goal', goal.title, goal.status, `${goal.progress}% progress`]);
-    });
-
-    // Process Habits
-    habits.forEach(habit => {
-      habit.completedDates.forEach(date => {
-        const month = date.slice(0, 7);
-        rows.push([month, 'Habit', habit.name, 'Completed', `Date: ${date}`]);
-      });
-      const currentMonth = new Date().toISOString().slice(0, 7);
-      rows.push([currentMonth, 'Habit-Streak', habit.name, habit.streak.toString(), 'Current Streak']);
-    });
-
-    // Process Health
-    health.forEach(entry => {
-      const month = entry.date.slice(0, 7);
-      rows.push([month, 'Health', 'Mood', entry.mood.toString(), `Date: ${entry.date}`]);
-      rows.push([month, 'Health', 'Sleep', `${entry.sleep}h`, `Date: ${entry.date}`]);
-      rows.push([month, 'Health', 'Water', `${entry.water}L`, `Date: ${entry.date}`]);
-      if (entry.workout) {
-        rows.push([month, 'Health', 'Workout', entry.workout, `Date: ${entry.date}`]);
-      }
-    });
-
-    // Process Blocks (Tasks)
-    blocks.forEach(block => {
-      const month = block.date.slice(0, 7);
-      rows.push([month, 'Task', block.title, block.completed ? 'Completed' : 'Pending', `Date: ${block.date}, MIT: ${block.isMIT}`]);
-    });
-
-    // Process Reviews
-    reviews.forEach(review => {
-      const month = review.weekStart.slice(0, 7);
-      rows.push([month, 'Weekly Review', 'Wins', review.wins, `Week Start: ${review.weekStart}`]);
-      rows.push([month, 'Weekly Review', 'Losses', review.losses, `Week Start: ${review.weekStart}`]);
-    });
-
-    // Process Finance
     transactions.forEach(t => {
-      const month = t.date.slice(0, 7);
-      rows.push([month, 'Finance', t.type, formatCurrency(t.amount), `Category: ${t.category}${t.source ? `, Source: ${t.source}` : ''}${t.note ? `, Note: ${t.note}` : ''}`]);
+      rows.push(['Finance', 'Transaction', t.category, formatCurrency(t.amount), `${t.type} on ${t.date}`]);
     });
-
     investments.forEach(inv => {
-      const month = inv.date.slice(0, 7);
-      rows.push([month, 'Investment', inv.type, formatCurrency(inv.amount), `Name: ${inv.name}`]);
+      rows.push(['Finance', 'Investment', inv.name, formatCurrency(inv.amount), inv.type]);
     });
 
-    // Convert to CSV string
-    const csvContent = rows.map(e => e.map(cell => `"${cell.replace(/"/g, '""')}"`).join(",")).join("\n");
+    // Goals
+    goals.forEach(goal => {
+      rows.push(['Goal', goal.category, goal.title, goal.status, `${goal.progress}%`]);
+    });
 
-    // Download CSV
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `life_os_export_${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Habits & Health
+    habits.forEach(habit => {
+      rows.push(['Habit', habit.category, habit.name, habit.streak.toString(), 'Current Streak']);
+    });
+    health.forEach(entry => {
+      rows.push(['Health', 'Daily', entry.date, `Mood: ${entry.mood}`, `Sleep: ${entry.sleep}h`]);
+    });
+
+    downloadCSV(rows, 'life_os_full_export');
   } catch (error) {
-    console.error('Failed to export data:', error);
-    alert('Failed to export data. Please check console for details.');
+    console.error('Failed to export all data:', error);
   }
 };
 
 export const exportVisionDataToCSV = (vision: VisionData) => {
   try {
-    const rows: string[][] = [
-      ['Section', 'Sub-Section', 'Content']
-    ];
-
-    // Principles
-    vision.principles.forEach((p, i) => {
-      rows.push(['Principles', `Principle ${i + 1}`, p]);
+    const rows: string[][] = [['Category', 'Title/Type', 'Content']];
+    (vision.pillars || []).forEach((p) => {
+      rows.push(['Core Pillar', p.title, p.description || '']);
     });
-
-    // Timeline
-    rows.push(['Timeline', '3-Year Vision', vision.threeYearVision]);
-    rows.push(['Timeline', '1-Year Sub-Vision', vision.oneYearVision]);
-    rows.push(['Timeline', 'Q1 (Jan-Mar)', vision.quarterlyGoals.q1]);
-    rows.push(['Timeline', 'Q2 (Apr-Jun)', vision.quarterlyGoals.q2]);
-    rows.push(['Timeline', 'Q3 (Jul-Sep)', vision.quarterlyGoals.q3]);
-    rows.push(['Timeline', 'Q4 (Oct-Dec)', vision.quarterlyGoals.q4]);
-
-    // Core Sections
-    rows.push(['8 Core Areas', 'Health', vision.coreSections.health]);
-    rows.push(['8 Core Areas', 'Family', vision.coreSections.family]);
-    rows.push(['8 Core Areas', 'Career', vision.coreSections.career]);
-    rows.push(['8 Core Areas', 'Financial', vision.coreSections.financial]);
-    rows.push(['8 Core Areas', 'Personal Growth', vision.coreSections.personalGrowth]);
-    rows.push(['8 Core Areas', 'Spirituality', vision.coreSections.spirituality]);
-    rows.push(['8 Core Areas', 'Social Impact', vision.coreSections.socialImpact]);
-    rows.push(['8 Core Areas', 'Joy & Experience', vision.coreSections.joyExperience]);
-
-    // Convert to CSV string
-    const csvContent = rows.map(e => e.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(",")).join("\n");
-
-    // Download CSV
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `vision_export_${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    rows.push(['Timeline', '3-Year Vision', vision.threeYearVision || '']);
+    rows.push(['Timeline', '1-Year Sub-Vision', vision.oneYearVision || '']);
+    (vision.objectives || []).forEach((obj) => {
+      rows.push(['Core Objective', obj.title, obj.description || '']);
+    });
+    if (vision.areas) {
+      Object.entries(vision.areas).forEach(([key, value]) => {
+        rows.push(['Domain Area', key, value || '']);
+      });
+    }
+    downloadCSV(rows, 'vision_export');
   } catch (error) {
     console.error('Failed to export vision data:', error);
-    alert('Failed to export vision data. Please check console for details.');
   }
 };
-export const exportFinanceDataToCSV = (transactions: Transaction[], investments: Investment[], budgets: Budget[]) => {
-  try {
-    const rows: string[][] = [
-      ['Date/Month', 'Type', 'Category/Name', 'Amount (INR)', 'Details']
-    ];
 
-    // Transactions
-    transactions.forEach(t => {
-      rows.push([t.date, t.type, t.category, t.amount.toString(), t.source ? `Source: ${t.source}` : '']);
-    });
-
-    // Investments
-    investments.forEach(inv => {
-      rows.push([inv.date.slice(0, 10), 'Investment', inv.name, inv.amount.toString(), `Type: ${inv.type}`]);
-    });
-
-    // Budgets
-    budgets.forEach(b => {
-      rows.push([b.month, 'Budget', b.category, b.limit.toString(), 'Monthly Limit']);
-    });
-
-    const csvContent = rows.map(e => e.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(",")).join("\n");
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `finance_export_${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error('Failed to export finance data:', error);
-    alert('Failed to export finance data. Please check console for details.');
-  }
-};
 export const exportGoalsDataToCSV = (goals: Goal[]) => {
   try {
-    const rows: string[][] = [['Title', 'Category', 'Timeframe', 'Status', 'Progress (%)', 'Description']];
+    const rows: string[][] = [['Title', 'Category', 'Quarter', 'Status', 'Progress (%)', 'Description']];
     goals.forEach(g => {
-      rows.push([g.title, g.category, g.timeframe, g.status, g.progress.toString(), g.description || '']);
+      rows.push([g.title, g.category, g.quarter || 'N/A', g.status, g.progress.toString(), g.description || '']);
     });
     downloadCSV(rows, 'goals_export');
   } catch (error) {
@@ -215,9 +101,9 @@ export const exportGoalsDataToCSV = (goals: Goal[]) => {
 
 export const exportExecutionDataToCSV = (tasks: any[]) => {
   try {
-    const rows: string[][] = [['Task', 'Priority', 'Status', 'Due Date']];
+    const rows: string[][] = [['Task', 'Priority', 'Status', 'Due Date', 'Description']];
     tasks.forEach(t => {
-      rows.push([t.content, t.priority, t.status, t.dueDate || '']);
+      rows.push([t.content, t.priority, t.status, t.dueDate || '', t.description || '']);
     });
     downloadCSV(rows, 'execution_export');
   } catch (error) {
@@ -225,26 +111,21 @@ export const exportExecutionDataToCSV = (tasks: any[]) => {
   }
 };
 
-export const exportHabitsDataToCSV = (habits: Habit[], health: HealthEntry[]) => {
+export const exportContentDataToCSV = (content: ContentPipelineData | any) => {
   try {
-    const rows: string[][] = [['Type', 'Name/Date', 'Status/Value', 'Details']];
-    habits.forEach(h => {
-      rows.push(['Habit', h.name, `Streak: ${h.streak}`, `Completions: ${h.completedDates.length}`]);
-    });
-    health.forEach(entry => {
-      rows.push(['Health', entry.date, `Mood: ${entry.mood}, Sleep: ${entry.sleep}h, Water: ${entry.water}L`, entry.workout || '']);
-    });
-    downloadCSV(rows, 'habits_health_export');
-  } catch (error) {
-    console.error('Failed to export habits data:', error);
-  }
-};
-
-export const exportContentDataToCSV = (items: any[]) => {
-  try {
-    const rows: string[][] = [['Title', 'Channel', 'Status', 'Priority', 'Due Date']];
-    items.forEach(item => {
-      rows.push([item.title, item.channel, item.status, item.priority, item.dueDate || '']);
+    const items = Array.isArray(content) ? content : (content.items || []);
+    const rows: string[][] = [['ID', 'Asset Categories', 'Title', 'Description', 'Status', 'Velocity', 'Start Date', 'End Date']];
+    items.forEach((item: any) => {
+      rows.push([
+        item.id,
+        item.channel,
+        item.title,
+        item.description || '',
+        item.status,
+        (item.velocity || 0).toString(),
+        item.startDate || '',
+        item.endDate || ''
+      ]);
     });
     downloadCSV(rows, 'content_pipeline_export');
   } catch (error) {
@@ -254,9 +135,9 @@ export const exportContentDataToCSV = (items: any[]) => {
 
 export const exportLibraryDataToCSV = (items: any[]) => {
   try {
-    const rows: string[][] = [['Name', 'Category', 'Status', 'Progress (%)', 'Format']];
+    const rows: string[][] = [['id', 'title', 'description', 'type', 'deadline']];
     items.forEach(item => {
-      rows.push([item.name, item.category, item.status, item.progress?.toString() || '0', item.format || '']);
+      rows.push([item.id, item.name, item.description || '', item.category, item.deadline || '']);
     });
     downloadCSV(rows, 'library_export');
   } catch (error) {
@@ -264,20 +145,67 @@ export const exportLibraryDataToCSV = (items: any[]) => {
   }
 };
 
-export const exportReflectionsDataToCSV = (items: any[]) => {
+export const exportFinanceDataToCSV = (transactions: Transaction[], investments: Investment[], budgets: Budget[]) => {
   try {
-    const rows: string[][] = [['Date', 'Reflection Snippet']];
-    items.forEach(item => {
-      rows.push([item.date, item.text]);
-    });
-    downloadCSV(rows, 'reflections_export');
+    const rows: string[][] = [['Date/Month', 'Type', 'Category/Name', 'Amount (INR)', 'Details']];
+    transactions.forEach(t => rows.push([t.date, t.type, t.category, t.amount.toString(), t.note || '']));
+    investments.forEach(inv => rows.push([inv.date, 'Investment', inv.name, inv.amount.toString(), inv.type]));
+    budgets.forEach(b => rows.push([b.month, 'Budget', b.category, b.limit.toString(), 'Limit']));
+    downloadCSV(rows, 'finance_export');
   } catch (error) {
-    console.error('Failed to export reflections data:', error);
+    console.error('Failed to export finance data:', error);
   }
 };
 
+export const exportHabitsDataToCSV = (habits: Habit[], health: HealthEntry[]) => {
+  try {
+    const rows: string[][] = [['Type', 'ID', 'Habit Name', 'Category', 'Priority', 'Start Date', 'End Date', 'Description', 'Streak']];
+    habits.forEach(h => {
+      rows.push(['Habit', h.id, h.name, h.category, h.priority, h.startDate || '', h.endDate || '', h.description || '', h.streak.toString()]);
+    });
+    downloadCSV(rows, 'habits_export');
+  } catch (error) {
+    console.error('Failed to export habits data:', error);
+  }
+};
+
+export const exportHealthDataToCSV = (health: HealthEntry[]) => {
+  try {
+    const rows: string[][] = [['Date', 'Sleep (h)', 'Water (L)', 'Mood (1-10)', 'Energy (1-10)', 'Workout']];
+    health.sort((a, b) => b.date.localeCompare(a.date)).forEach(h => {
+      rows.push([h.date, h.sleep.toString(), h.water.toString(), h.mood.toString(), h.energy.toString(), h.workout || '']);
+    });
+    downloadCSV(rows, 'biological_archive');
+  } catch (error) {
+    console.error('Failed to export health data:', error);
+  }
+};
+
+export const exportTransactionsToCSV = (transactions: Transaction[]) => {
+  const rows = [['ID', 'Categories', 'Balance', 'Transaction', 'Transaction Type', 'Date', 'Description', 'Amount']];
+  let currentBalance = 0;
+  transactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(t => {
+    if (t.type === 'Income') currentBalance += t.amount;
+    else currentBalance -= t.amount;
+    rows.push([t.id, t.category, currentBalance.toString(), t.note || '', t.type, t.date, t.note || '', t.amount.toString()]);
+  });
+  downloadCSV(rows, 'transactions_export');
+};
+
+export const exportBudgetsToCSV = (budgets: Budget[]) => {
+  const rows = [['Categories', 'Month', 'Amount', 'Spent']];
+  budgets.forEach(b => rows.push([b.category, b.month, b.limit.toString(), (b.spent || 0).toString()]));
+  downloadCSV(rows, 'budgets_export');
+};
+
+export const exportPortfolioToCSV = (investments: Investment[]) => {
+  const rows = [['Title', 'Type', 'Date', 'Amount', 'Description']];
+  investments.forEach(inv => rows.push([inv.name, inv.type, inv.date, inv.amount.toString(), inv.description || '']));
+  downloadCSV(rows, 'portfolio_export');
+};
+
 const downloadCSV = (rows: string[][], filename: string) => {
-  const csvContent = rows.map(e => e.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(",")).join("\n");
+  const csvContent = rows.map(e => e.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(",")).join("\n");
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement("a");
   const url = URL.createObjectURL(blob);

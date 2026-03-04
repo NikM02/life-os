@@ -11,7 +11,6 @@ const navItems = [
   { title: 'Vision', url: '/vision', icon: Eye },
   { title: 'Goals', url: '/goals', icon: Target },
   { title: 'Execution', url: '/execution', icon: ListChecks },
-  { title: 'Journals', url: '/neural-journals', icon: BrainCircuit },
   { title: 'Pipeline', url: '/content', icon: Clapperboard },
   { title: 'Habits', url: '/habits', icon: Activity },
   { title: 'Finance', url: '/finance', icon: Wallet },
