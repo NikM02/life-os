@@ -102,6 +102,14 @@
     border-style: dotted !important;
   }
 
+  .border-solid {
+    border-style: solid !important;
+  }
+
+  .border-none {
+    border-style: none !important;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Playfair Display', serif;

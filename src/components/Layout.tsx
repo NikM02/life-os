@@ -49,7 +49,7 @@ export function Layout({ children }: LayoutProps) {
 
               <button
                 onClick={() => setIsDark(!isDark)}
-                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all border border-transparent hover:border-border/40"
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all border border-none hover:border-border/40"
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
