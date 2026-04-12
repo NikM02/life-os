@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Target, Activity, Wallet, Clapperboard, BookOpen, BrainCircuit, ListChecks, Eye, Layers
+  Activity, Wallet, Clapperboard, BookOpen, Eye
 } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
 import { cn } from '@/lib/utils';
@@ -7,23 +7,21 @@ import { Link, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
 const navItems = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Vision', url: '/vision', icon: Eye },
-  { title: 'Goals', url: '/goals', icon: Target },
-  { title: 'Execution', url: '/execution', icon: ListChecks },
-  { title: 'Pipeline', url: '/content', icon: Clapperboard },
+  { title: 'Mission', url: '/mission', icon: Eye },
+  { title: 'Youtube', url: '/youtube', icon: Clapperboard },
   { title: 'Habits', url: '/habits', icon: Activity },
   { title: 'Finance', url: '/finance', icon: Wallet },
   { title: 'Library', url: '/library', icon: BookOpen },
 ];
 
+
 export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="border-r border-border/40 bg-background/50 backdrop-blur-xl transition-all duration-300">
+    <Sidebar className="hidden md:flex border-r border-border/40 bg-background/50 backdrop-blur-xl transition-all duration-300">
       <div className="p-8 pb-10">
-        <Link to="/dashboard" className="flex items-center gap-4 group">
+        <Link to="/mission" className="flex items-center gap-4 group">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-semibold text-xs">N</span>
           </div>

@@ -13,7 +13,7 @@ import { exportContentDataToCSV } from '@/lib/export-utils';
 const CHANNELS = ['wholenix', 'nikstrm', 'trivahh', 'website', 'digi assest'];
 const STATUSES: ContentStatus[] = ['Idea', 'Script & Thumbnail', 'Outline & Draft', 'Published'];
 
-export default function ContentPipeline() {
+export default function Youtube() {
     const { content, setContent } = useData();
     const [view, setView] = useState<'board' | 'list'>('board');
     const [searchQuery, setSearchQuery] = useState('');
@@ -81,7 +81,7 @@ export default function ContentPipeline() {
 
     return (
         <div className="max-w-7xl mx-auto pb-32 px-4 animate-fade-in shadow-none">
-            <PageHeader title="Content Pipeline">
+            <PageHeader title="Youtube">
                 <div className="flex items-center gap-3">
                     <Button variant="ghost" size="sm" onClick={() => exportContentDataToCSV(content)} className="opacity-40 hover:opacity-100">
                         <Download size={14} className="mr-2" /> Export

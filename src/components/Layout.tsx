@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 import { AppSidebar } from './AppSidebar';
+import { BottomNav } from './BottomNav';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Moon, Sun, Download } from 'lucide-react';
@@ -12,7 +13,7 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [isDark, setIsDark] = useLocalStorage('lifeos-dark', true);
+  const [isDark, setIsDark] = useLocalStorage('lifeos-dark', false);
 
   const { vision } = useData();
 
@@ -28,7 +29,7 @@ export function Layout({ children }: LayoutProps) {
         <AppSidebar />
         <div className="flex-1 flex flex-col min-h-screen">
           <header className="h-14 flex items-center justify-between border-b border-solid border-border/40 px-6 bg-background/60 backdrop-blur-xl sticky top-0 z-20">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 hidden md:flex">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all rounded-xl" />
               <div className="h-4 w-px bg-border/40 hidden sm:block" />
               <div className="hidden sm:block text-[10px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">Workspace</div>
@@ -55,9 +56,10 @@ export function Layout({ children }: LayoutProps) {
               </button>
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full overflow-auto">
+          <main className="flex-1 p-4 pb-28 md:p-8 lg:p-12 max-w-[1600px] mx-auto w-full overflow-auto">
             {children}
           </main>
+          <BottomNav />
         </div>
       </div>
 
